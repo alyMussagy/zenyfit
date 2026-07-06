@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <rect width="60" height="60" rx="12" fill="#7C9A6E"/>
+  <text x="30" y="40" text-anchor="middle" fill="white" font-size="30" font-weight="bold" font-family="sans-serif">Z</text>
+  <path d="M42 16 C50 22, 52 30, 46 40 C40 32, 36 24, 42 16Z" fill="#A8C49A" opacity="0.8"/>
+  <circle cx="16" cy="18" r="2" fill="#A8C49A"/>
+  <circle cx="12" cy="24" r="1.5" fill="#C4D9B9"/>
+  <circle cx="18" cy="26" r="1" fill="#A8C49A"/>
+</svg>

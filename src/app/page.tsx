@@ -9,6 +9,7 @@ import ProductCatalog from '@/components/storefront/ProductCatalog';
 import AboutSection from '@/components/storefront/AboutSection';
 import Footer from '@/components/storefront/Footer';
 import Dashboard from '@/components/dashboard/Dashboard';
+import WhatsAppButton from '@/components/storefront/WhatsAppButton';
 
 function StoreView() {
   return (
@@ -19,6 +20,7 @@ function StoreView() {
         <AboutSection />
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }

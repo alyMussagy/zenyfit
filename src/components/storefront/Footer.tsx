@@ -1,7 +1,7 @@
 'use client';
 
 import { MapPin, Phone, Mail, Clock, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 
 export default function Footer() {
   return (
@@ -52,7 +52,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
-                <span className="text-sm text-white/60">+258 84 XXX XXXX</span>
+                <span className="text-sm text-white/60">{ZENYFIT_CONFIG.contact.phone}</span>
               </li>
               <li className="flex items-center gap-3">
                 <MessageCircle className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
@@ -60,15 +60,15 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
-                <span className="text-sm text-white/60">info@zenyfit.mz</span>
+                <span className="text-sm text-white/60">{ZENYFIT_CONFIG.contact.email}</span>
               </li>
               <li className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
-                <span className="text-sm text-white/60">Maputo, Moçambique</span>
+                <span className="text-sm text-white/60">{ZENYFIT_CONFIG.contact.address}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Clock className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
-                <span className="text-sm text-white/60">Seg-Sex: 8h - 18h</span>
+                <span className="text-sm text-white/60">{ZENYFIT_CONFIG.hours}</span>
               </li>
             </ul>
           </div>

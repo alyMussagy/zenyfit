@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Pencil, Trash2, Search, X, Package } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Pencil, Trash2, Search, X, Package, Upload, ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +27,8 @@ export default function ProductManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -72,6 +74,42 @@ export default function ProductManager() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch {
       toast.error('Erro ao eliminar produto');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate size
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Imagem demasiado grande. Máximo 5MB.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setForm((prev) => ({ ...prev, image: data.url }));
+        toast.success('Imagem carregada');
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'Erro no upload');
+      }
+    } catch {
+      toast.error('Erro no upload da imagem');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -166,10 +204,67 @@ export default function ProductManager() {
                   </select>
                 </div>
               </div>
+
+              {/* Image Upload */}
               <div>
-                <Label className="text-sm font-medium">URL da Imagem</Label>
-                <Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." className="mt-1.5" />
+                <Label className="text-sm font-medium">Imagem do Produto</Label>
+                <div className="mt-1.5 space-y-2">
+                  {form.image && (
+                    <div className="relative w-full h-40 rounded-lg overflow-hidden bg-gray-100">
+                      <img
+                        src={form.image}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, image: '' })}
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="w-full h-12 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-zeny-sage hover:text-zeny-sage transition-colors disabled:opacity-50"
+                  >
+                    {uploading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : form.image ? (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Alterar imagem
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="w-4 h-4" />
+                        Carregar imagem (JPG, PNG, WebP - máx. 5MB)
+                      </>
+                    )}
+                  </button>
+                  <div className="text-center">
+                    <span className="text-xs text-gray-400">ou</span>
+                  </div>
+                  <Input
+                    value={form.image}
+                    onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    placeholder="Cole URL de imagem externa (opcional)"
+                    className="text-xs"
+                  />
+                </div>
               </div>
+
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.inStock} onChange={(e) => setForm({ ...form, inStock: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-zeny-sage focus:ring-zeny-sage" />
@@ -182,7 +277,7 @@ export default function ProductManager() {
               </div>
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">Cancelar</Button>
-                <Button type="submit" className="flex-1 bg-zeny-sage hover:bg-zeny-sage-dark text-white">
+                <Button type="submit" disabled={uploading} className="flex-1 bg-zeny-sage hover:bg-zeny-sage-dark text-white">
                   {editingId ? 'Actualizar' : 'Criar Produto'}
                 </Button>
               </div>
@@ -225,14 +320,14 @@ export default function ProductManager() {
                     <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
+                          <div className="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
                             {product.image ? (
                               <img src={product.image} alt="" className="w-full h-full object-cover"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                               />
                             ) : (
                               <div className="flex items-center justify-center w-full h-full">
-                                <Package className="w-4 h-4 text-gray-300" />
+                                <Package className="w-5 h-5 text-gray-300" />
                               </div>
                             )}
                           </div>
@@ -260,10 +355,10 @@ export default function ProductManager() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center">
+                          <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center" title="Editar">
                             <Pencil className="w-4 h-4 text-blue-500" />
                           </button>
-                          <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center">
+                          <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center" title="Eliminar">
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </button>
                         </div>

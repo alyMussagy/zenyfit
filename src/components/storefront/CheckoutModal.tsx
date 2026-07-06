@@ -7,11 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { X, CheckCircle, Loader2 } from 'lucide-react';
+import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 
-const provinces = [
-  'Maputo Cidade', 'Maputo Província', 'Gaza', 'Inhambane', 'Sofala',
-  'Zambézia', 'Nampula', 'Cabo Delgado', 'Niassa', 'Tete', 'Manica',
-];
+const provinces = ZENYFIT_CONFIG.provinces;
 
 interface CheckoutModalProps {
   open: boolean;
@@ -30,6 +28,21 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   });
 
   if (!open) return null;
+
+  const buildWhatsAppMessage = (orderId?: string) => {
+    let msg = `*NOVO PEDIDO ${orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''}*\n\n`;
+    msg += `*Cliente:* ${form.customerName}\n`;
+    msg += `*Telefone:* ${form.customerPhone}\n`;
+    msg += `*Localização:* ${form.city}, ${form.province}\n`;
+    msg += `*Endereço:* ${form.address}\n\n`;
+    msg += `*ITENS:*\n`;
+    items.forEach((item, i) => {
+      msg += `${i + 1}. ${item.name} x${item.quantity} — ${(item.price * item.quantity).toLocaleString('pt-MZ')} MTn\n`;
+    });
+    msg += `\n*TOTAL: ${totalPrice().toLocaleString('pt-MZ')} MTn*\n`;
+    msg += `\n*Pagamento:* Na entrega`;
+    return encodeURIComponent(msg);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,9 +69,21 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
       });
 
       if (res.ok) {
-        toast.success('Pedido realizado com sucesso! Entraremos em contacto em breve.');
+        const order = await res.json();
+        const whatsappUrl = `https://wa.me/${ZENYFIT_CONFIG.whatsapp}?text=${buildWhatsAppMessage(order.id)}`;
+
         clearCart();
         onClose();
+
+        // Show success toast with WhatsApp option
+        toast.success('Pedido realizado com sucesso!', {
+          description: 'Pode confirmar pelo WhatsApp para acompanhamento mais rápido.',
+          duration: 8000,
+          action: {
+            label: 'Enviar pelo WhatsApp',
+            onClick: () => window.open(whatsappUrl, '_blank'),
+          },
+        });
       } else {
         toast.error('Erro ao realizar pedido. Tente novamente.');
       }
@@ -70,7 +95,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
       <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="sticky top-0 bg-white p-4 border-b border-zeny-sage/10 flex items-center justify-between rounded-t-3xl z-10">
@@ -179,9 +204,16 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                 A processar...
               </>
             ) : (
-              'Confirmar Pedido'
+              <>
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Confirmar Pedido
+              </>
             )}
           </Button>
+
+          <p className="text-center text-xs text-zeny-forest/40">
+            Após confirmar, pode enviar os detalhes pelo WhatsApp para acompanhamento mais rápido
+          </p>
         </form>
       </div>
     </div>

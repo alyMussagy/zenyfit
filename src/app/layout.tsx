@@ -12,10 +12,15 @@ export const metadata: Metadata = {
   title: "ZenyFit | Saúde, Beleza e Bem-estar em Moçambique",
   description: "Loja online de produtos selecionados para cuidar da sua pele, corpo e autoestima. Entregamos para todo o país. Pagamento na entrega.",
   keywords: ["ZenyFit", "saúde", "beleza", "bem-estar", "Moçambique", "produtos naturais", "skincare", "cosméticos"],
+  icons: {
+    icon: "/favicon.svg",
+  },
   openGraph: {
-    title: "ZenyFit | Saúde, Beleza e Bem-estar",
-    description: "Produtos selecionados para cuidar da sua pele, corpo e autoestima",
+    title: "ZenyFit | Saúde, Beleza e Bem-estar em Moçambique",
+    description: "Produtos selecionados para cuidar da sua pele, corpo e autoestima. Entregamos para todo o país.",
     type: "website",
+    locale: "pt_MZ",
+    siteName: "ZenyFit",
   },
 };
 
