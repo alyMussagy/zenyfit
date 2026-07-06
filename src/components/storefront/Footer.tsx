@@ -5,7 +5,7 @@ import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 
 export default function Footer() {
   return (
-    <footer id="contacto" className="bg-zeny-forest text-white">
+    <footer id="contacto" className="bg-zeny-green-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
@@ -16,7 +16,7 @@ export default function Footer() {
                   <text x="30" y="38" textAnchor="middle" fill="white" fontSize="28" fontWeight="bold" fontFamily="sans-serif">Z</text>
                 </svg>
               </div>
-              <span className="text-xl font-bold tracking-tight">Zeny<span className="text-zeny-sage-light">Fit</span></span>
+              <span className="text-xl font-bold tracking-tight">Zeny<span className="text-zeny-green-light">Fit</span></span>
             </div>
             <p className="text-sm text-white/60 leading-relaxed">
               Saúde, Equilíbrio e Autoestima. Produtos seleccionados para cuidar de si, entregues em todo Moçambique.
@@ -25,7 +25,7 @@ export default function Footer() {
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-zeny-sage-light">Navegação</h4>
+            <h4 className="font-semibold mb-4 text-zeny-green-light">Navegação</h4>
             <ul className="space-y-2">
               <li><a href="#hero" className="text-sm text-white/60 hover:text-white transition-colors">Início</a></li>
               <li><a href="#produtos" className="text-sm text-white/60 hover:text-white transition-colors">Produtos</a></li>
@@ -36,7 +36,7 @@ export default function Footer() {
 
           {/* Categories */}
           <div>
-            <h4 className="font-semibold mb-4 text-zeny-sage-light">Categorias</h4>
+            <h4 className="font-semibold mb-4 text-zeny-green-light">Categorias</h4>
             <ul className="space-y-2">
               <li><span className="text-sm text-white/60">Skincare</span></li>
               <li><span className="text-sm text-white/60">Cuidados Corporais</span></li>
@@ -48,26 +48,26 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4 text-zeny-sage-light">Contacto</h4>
+            <h4 className="font-semibold mb-4 text-zeny-green-light">Contacto</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
+                <Phone className="w-4 h-4 text-zeny-green-light flex-shrink-0" />
                 <span className="text-sm text-white/60">{ZENYFIT_CONFIG.contact.phone}</span>
               </li>
               <li className="flex items-center gap-3">
-                <MessageCircle className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
+                <MessageCircle className="w-4 h-4 text-zeny-green-light flex-shrink-0" />
                 <span className="text-sm text-white/60">WhatsApp disponível</span>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
+                <Mail className="w-4 h-4 text-zeny-green-light flex-shrink-0" />
                 <span className="text-sm text-white/60">{ZENYFIT_CONFIG.contact.email}</span>
               </li>
               <li className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-zeny-green-light flex-shrink-0" />
                 <span className="text-sm text-white/60">{ZENYFIT_CONFIG.contact.address}</span>
               </li>
               <li className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-zeny-sage-light flex-shrink-0" />
+                <Clock className="w-4 h-4 text-zeny-green-light flex-shrink-0" />
                 <span className="text-sm text-white/60">{ZENYFIT_CONFIG.hours}</span>
               </li>
             </ul>

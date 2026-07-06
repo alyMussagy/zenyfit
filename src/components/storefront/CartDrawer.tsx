@@ -14,11 +14,11 @@ export default function CartDrawer() {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
-        <div className="w-20 h-20 rounded-full bg-zeny-warm flex items-center justify-center mb-4">
-          <ShoppingBag className="w-10 h-10 text-zeny-sage/40" />
+        <div className="w-20 h-20 rounded-full bg-zeny-green-card flex items-center justify-center mb-4">
+          <ShoppingBag className="w-10 h-10 text-zeny-green/40" />
         </div>
-        <p className="text-zeny-forest/50 font-medium mb-1">Carrinho vazio</p>
-        <p className="text-zeny-forest/30 text-sm text-center">Adicione produtos para começar as suas compras</p>
+        <p className="text-zeny-green-dark/50 font-medium mb-1">Carrinho vazio</p>
+        <p className="text-zeny-green-dark/30 text-sm text-center">Adicione produtos para começar as suas compras</p>
       </div>
     );
   }
@@ -26,9 +26,9 @@ export default function CartDrawer() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-zeny-sage/10">
+      <div className="p-4 border-b border-zeny-green/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-zeny-forest">
+          <h2 className="text-lg font-bold text-zeny-green-dark">
             Carrinho ({items.length})
           </h2>
           <button
@@ -43,32 +43,32 @@ export default function CartDrawer() {
       {/* Items */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {items.map((item) => (
-          <div key={item.id} className="flex gap-3 bg-zeny-warm/50 rounded-xl p-3">
-            <div className="w-16 h-16 rounded-lg bg-zeny-warm flex-shrink-0 overflow-hidden">
+          <div key={item.id} className="flex gap-3 bg-zeny-green-card/50 rounded-xl p-3">
+            <div className="w-16 h-16 rounded-lg bg-zeny-green-card flex-shrink-0 overflow-hidden">
               <img src={item.image} alt={item.name} className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
-                  (target.parentElement as HTMLElement).innerHTML = '<div class="flex items-center justify-center w-full h-full bg-zeny-warm"><svg class="w-6 h-6 text-zeny-sage/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
+                  (target.parentElement as HTMLElement).innerHTML = '<div class="flex items-center justify-center w-full h-full bg-zeny-green-card"><svg class="w-6 h-6 text-zeny-green/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
                 }}
               />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-zeny-forest truncate">{item.name}</p>
-              <p className="text-sm font-bold text-zeny-sage mt-1">
+              <p className="text-sm font-medium text-zeny-green-dark truncate">{item.name}</p>
+              <p className="text-sm font-bold text-zeny-green mt-1">
                 {item.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="w-7 h-7 rounded-full border border-zeny-sage/20 flex items-center justify-center hover:bg-zeny-sage/10"
+                  className="w-7 h-7 rounded-full border border-zeny-green/20 flex items-center justify-center hover:bg-zeny-green/10"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
                 <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="w-7 h-7 rounded-full border border-zeny-sage/20 flex items-center justify-center hover:bg-zeny-sage/10"
+                  className="w-7 h-7 rounded-full border border-zeny-green/20 flex items-center justify-center hover:bg-zeny-green/10"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -85,19 +85,19 @@ export default function CartDrawer() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-zeny-sage/10 p-4 space-y-3 bg-white">
+      <div className="border-t border-zeny-green/10 p-4 space-y-3 bg-white">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-zeny-forest/60">Subtotal</span>
-          <span className="font-bold text-zeny-forest">
+          <span className="text-sm text-zeny-green-dark/60">Subtotal</span>
+          <span className="font-bold text-zeny-green-dark">
             {totalPrice().toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
           </span>
         </div>
-        <p className="text-xs text-zeny-forest/40 text-center">
+        <p className="text-xs text-zeny-green-dark/40 text-center">
           Entrega + pagamento na entrega
         </p>
         <Button
           onClick={() => setShowCheckout(true)}
-          className="w-full bg-zeny-sage hover:bg-zeny-sage-dark text-white rounded-full py-5 text-base font-semibold"
+          className="w-full bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full py-5 text-base font-semibold"
         >
           Finalizar Pedido
         </Button>

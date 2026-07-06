@@ -90,7 +90,7 @@ export default function Dashboard() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                 activeTab === tab.id
-                  ? 'bg-zeny-sage text-white shadow-md'
+                  ? 'bg-zeny-green text-white shadow-md'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
@@ -205,7 +205,7 @@ export default function Dashboard() {
                     ) : (
                       stats.topProducts.map((p, i) => (
                         <div key={p.productName} className="flex items-center gap-3">
-                          <span className="w-6 h-6 rounded-full bg-zeny-sage/10 flex items-center justify-center text-xs font-bold text-zeny-sage">
+                          <span className="w-6 h-6 rounded-full bg-zeny-green/10 flex items-center justify-center text-xs font-bold text-zeny-green">
                             {i + 1}
                           </span>
                           <div className="flex-1 min-w-0">
@@ -230,7 +230,7 @@ export default function Dashboard() {
                   <CardTitle className="text-base font-semibold">Pedidos Recentes</CardTitle>
                   <button
                     onClick={() => setActiveTab('orders')}
-                    className="text-sm text-zeny-sage hover:underline font-medium"
+                    className="text-sm text-zeny-green hover:underline font-medium"
                   >
                     Ver todos
                   </button>

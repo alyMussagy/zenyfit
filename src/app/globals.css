@@ -41,49 +41,47 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-zeny-cream: #FDF8F0;
-  --color-zeny-sage: #7C9A6E;
-  --color-zeny-sage-light: #A8C49A;
-  --color-zeny-sage-dark: #5A7A4C;
-  --color-zeny-forest: #2D5016;
-  --color-zeny-leaf: #4CAF50;
-  --color-zeny-warm: #F5EFE0;
-  --color-zeny-brown: #8B7355;
+  --color-zeny-cream: #F6EBDF;
+  --color-zeny-green: #38B802;
+  --color-zeny-green-dark: #2E9802;
+  --color-zeny-green-light: #6FD63A;
+  --color-zeny-green-card: #EAF8E3;
+  --color-zeny-warm: #F6EBDF;
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #FDF8F0;
-  --foreground: #2D3B2D;
+  --background: #F6EBDF;
+  --foreground: #1A2E1A;
   --card: #FFFFFF;
-  --card-foreground: #2D3B2D;
+  --card-foreground: #1A2E1A;
   --popover: #FFFFFF;
-  --popover-foreground: #2D3B2D;
-  --primary: #5A7A4C;
+  --popover-foreground: #1A2E1A;
+  --primary: #38B802;
   --primary-foreground: #FFFFFF;
-  --secondary: #F5EFE0;
-  --secondary-foreground: #2D5016;
-  --muted: #F5EFE0;
-  --muted-foreground: #6B7B6B;
-  --accent: #A8C49A;
-  --accent-foreground: #2D5016;
+  --secondary: #EAF8E3;
+  --secondary-foreground: #2E9802;
+  --muted: #EAF8E3;
+  --muted-foreground: #5A6B5A;
+  --accent: #6FD63A;
+  --accent-foreground: #2E9802;
   --destructive: #DC2626;
-  --border: #E0D8C8;
-  --input: #E0D8C8;
-  --ring: #7C9A6E;
-  --chart-1: #7C9A6E;
-  --chart-2: #A8C49A;
-  --chart-3: #5A7A4C;
-  --chart-4: #4CAF50;
+  --border: #D6CFC5;
+  --input: #D6CFC5;
+  --ring: #38B802;
+  --chart-1: #38B802;
+  --chart-2: #6FD63A;
+  --chart-3: #2E9802;
+  --chart-4: #EAF8E3;
   --chart-5: #8B7355;
-  --sidebar: #2D5016;
+  --sidebar: #2E9802;
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #A8C49A;
-  --sidebar-primary-foreground: #2D5016;
-  --sidebar-accent: #3D6226;
+  --sidebar-primary: #6FD63A;
+  --sidebar-primary-foreground: #2E9802;
+  --sidebar-accent: #35A803;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #3D6226;
-  --sidebar-ring: #A8C49A;
+  --sidebar-border: #35A803;
+  --sidebar-ring: #6FD63A;
 }
 
 @layer base {
@@ -133,5 +131,5 @@ html {
 }
 
 .leaf-decoration {
-  filter: drop-shadow(0 2px 8px rgba(92, 122, 76, 0.15));
+  filter: drop-shadow(0 2px 8px rgba(56, 184, 2, 0.15));
 }

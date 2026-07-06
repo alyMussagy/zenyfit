@@ -98,62 +98,62 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
       <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="sticky top-0 bg-white p-4 border-b border-zeny-sage/10 flex items-center justify-between rounded-t-3xl z-10">
-          <h2 className="text-lg font-bold text-zeny-forest">Finalizar Pedido</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-zeny-warm flex items-center justify-center">
-            <X className="w-4 h-4 text-zeny-forest/60" />
+        <div className="sticky top-0 bg-white p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-3xl z-10">
+          <h2 className="text-lg font-bold text-zeny-green-dark">Finalizar Pedido</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-zeny-green-card flex items-center justify-center">
+            <X className="w-4 h-4 text-zeny-green-dark/60" />
           </button>
         </div>
 
         {/* Order Summary */}
-        <div className="p-4 bg-zeny-warm/30">
-          <p className="text-sm font-medium text-zeny-forest/60 mb-2">{items.length} item(ns) no carrinho</p>
+        <div className="p-4 bg-zeny-green-card/30">
+          <p className="text-sm font-medium text-zeny-green-dark/60 mb-2">{items.length} item(ns) no carrinho</p>
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {items.map((item) => (
               <div key={item.id} className="flex justify-between text-sm">
-                <span className="text-zeny-forest/70 truncate mr-2">{item.name} x{item.quantity}</span>
-                <span className="text-zeny-forest font-medium whitespace-nowrap">
+                <span className="text-zeny-green-dark/70 truncate mr-2">{item.name} x{item.quantity}</span>
+                <span className="text-zeny-green-dark font-medium whitespace-nowrap">
                   {(item.price * item.quantity).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                 </span>
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-3 pt-3 border-t border-zeny-sage/10">
-            <span className="font-bold text-zeny-forest">Total</span>
-            <span className="font-bold text-zeny-sage text-lg">{totalPrice().toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}</span>
+          <div className="flex justify-between mt-3 pt-3 border-t border-zeny-green/10">
+            <span className="font-bold text-zeny-green-dark">Total</span>
+            <span className="font-bold text-zeny-green text-lg">{totalPrice().toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}</span>
           </div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
-            <Label className="text-zeny-forest text-sm font-medium">Nome Completo *</Label>
+            <Label className="text-zeny-green-dark text-sm font-medium">Nome Completo *</Label>
             <Input
               value={form.customerName}
               onChange={(e) => setForm({ ...form, customerName: e.target.value })}
               placeholder="Seu nome completo"
-              className="mt-1.5 border-zeny-sage/20"
+              className="mt-1.5 border-zeny-green/20"
               required
             />
           </div>
 
           <div>
-            <Label className="text-zeny-forest text-sm font-medium">Telefone / WhatsApp *</Label>
+            <Label className="text-zeny-green-dark text-sm font-medium">Telefone / WhatsApp *</Label>
             <Input
               value={form.customerPhone}
               onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
               placeholder="84 XXX XXXX ou 86 XXX XXXX"
-              className="mt-1.5 border-zeny-sage/20"
+              className="mt-1.5 border-zeny-green/20"
               required
             />
           </div>
 
           <div>
-            <Label className="text-zeny-forest text-sm font-medium">Província *</Label>
+            <Label className="text-zeny-green-dark text-sm font-medium">Província *</Label>
             <select
               value={form.province}
               onChange={(e) => setForm({ ...form, province: e.target.value })}
-              className="mt-1.5 w-full h-10 rounded-md border border-zeny-sage/20 bg-white px-3 text-sm text-zeny-forest focus:outline-none focus:ring-2 focus:ring-zeny-sage/30"
+              className="mt-1.5 w-full h-10 rounded-md border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
               required
             >
               <option value="">Selecione a província</option>
@@ -164,39 +164,39 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
           </div>
 
           <div>
-            <Label className="text-zeny-forest text-sm font-medium">Cidade / Distrito *</Label>
+            <Label className="text-zeny-green-dark text-sm font-medium">Cidade / Distrito *</Label>
             <Input
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
               placeholder="Ex: Matola, Beira, Nampula..."
-              className="mt-1.5 border-zeny-sage/20"
+              className="mt-1.5 border-zeny-green/20"
               required
             />
           </div>
 
           <div>
-            <Label className="text-zeny-forest text-sm font-medium">Endereço Completo *</Label>
+            <Label className="text-zeny-green-dark text-sm font-medium">Endereço Completo *</Label>
             <textarea
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
               placeholder="Rua, bairro, número de casa..."
-              className="mt-1.5 w-full min-h-[80px] rounded-md border border-zeny-sage/20 bg-white px-3 py-2 text-sm text-zeny-forest focus:outline-none focus:ring-2 focus:ring-zeny-sage/30 resize-none"
+              className="mt-1.5 w-full min-h-[80px] rounded-md border border-zeny-green/20 bg-white px-3 py-2 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none"
               required
             />
           </div>
 
-          <div className="bg-zeny-sage/5 rounded-xl p-3 flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-zeny-sage mt-0.5 flex-shrink-0" />
+          <div className="bg-zeny-green/5 rounded-xl p-3 flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-zeny-green mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-zeny-forest">Pagamento na Entrega</p>
-              <p className="text-xs text-zeny-forest/50 mt-0.5">Pague apenas quando receber os seus produtos no endereço indicado</p>
+              <p className="text-sm font-medium text-zeny-green-dark">Pagamento na Entrega</p>
+              <p className="text-xs text-zeny-green-dark/50 mt-0.5">Pague apenas quando receber os seus produtos no endereço indicado</p>
             </div>
           </div>
 
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-zeny-sage hover:bg-zeny-sage-dark text-white rounded-full py-5 text-base font-semibold"
+            className="w-full bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full py-5 text-base font-semibold"
           >
             {loading ? (
               <>
@@ -211,7 +211,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             )}
           </Button>
 
-          <p className="text-center text-xs text-zeny-forest/40">
+          <p className="text-center text-xs text-zeny-green-dark/40">
             Após confirmar, pode enviar os detalhes pelo WhatsApp para acompanhamento mais rápido
           </p>
         </form>

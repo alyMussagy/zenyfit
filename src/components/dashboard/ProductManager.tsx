@@ -155,7 +155,7 @@ export default function ProductManager() {
           </div>
           <Button
             onClick={() => { resetForm(); setShowForm(true); }}
-            className="bg-zeny-sage hover:bg-zeny-sage-dark text-white whitespace-nowrap"
+            className="bg-zeny-green hover:bg-zeny-green-dark text-white whitespace-nowrap"
           >
             <Plus className="w-4 h-4 mr-2" />
             Novo Produto
@@ -184,7 +184,7 @@ export default function ProductManager() {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="Descrição detalhada do produto..."
-                  className="mt-1.5 w-full min-h-[80px] rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zeny-sage/30 resize-none"
+                  className="mt-1.5 w-full min-h-[80px] rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none"
                   required
                 />
               </div>
@@ -198,7 +198,7 @@ export default function ProductManager() {
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="mt-1.5 w-full h-10 rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zeny-sage/30"
+                    className="mt-1.5 w-full h-10 rounded-md border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
                   >
                     {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -237,7 +237,7 @@ export default function ProductManager() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="w-full h-12 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-zeny-sage hover:text-zeny-sage transition-colors disabled:opacity-50"
+                    className="w-full h-12 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center gap-2 text-sm text-gray-500 hover:border-zeny-green hover:text-zeny-green transition-colors disabled:opacity-50"
                   >
                     {uploading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -267,17 +267,17 @@ export default function ProductManager() {
 
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.inStock} onChange={(e) => setForm({ ...form, inStock: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-zeny-sage focus:ring-zeny-sage" />
+                  <input type="checkbox" checked={form.inStock} onChange={(e) => setForm({ ...form, inStock: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-zeny-green focus:ring-zeny-green" />
                   <span className="text-sm text-gray-700">Em stock</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-zeny-sage focus:ring-zeny-sage" />
+                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-zeny-green focus:ring-zeny-green" />
                   <span className="text-sm text-gray-700">Destaque</span>
                 </label>
               </div>
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">Cancelar</Button>
-                <Button type="submit" disabled={uploading} className="flex-1 bg-zeny-sage hover:bg-zeny-sage-dark text-white">
+                <Button type="submit" disabled={uploading} className="flex-1 bg-zeny-green hover:bg-zeny-green-dark text-white">
                   {editingId ? 'Actualizar' : 'Criar Produto'}
                 </Button>
               </div>
