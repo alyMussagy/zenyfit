@@ -8,11 +8,11 @@
 export const ZENYFIT_CONFIG = {
   // Número de WhatsApp da loja (formato internacional sem +)
   // Exemplo: '258841234567' para +258 84 123 4567
-  whatsapp: '258840000000',
+  whatsapp: '258875775167',
 
   // Informações de contacto
   contact: {
-    phone: '+258 84 XXX XXXX',   // TODO: substituir
+    phone: '+258 87 577 5167',
     email: 'info@zenyfit.mz',
     address: 'Maputo, Moçambique', // TODO: substituir pelo endereço real
   },

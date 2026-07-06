@@ -1,6 +1,6 @@
 'use client';
 
-import { Leaf, Heart, Shield, Truck, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { Leaf, Heart, Shield, Truck } from 'lucide-react';
 
 export default function AboutSection() {
   return (

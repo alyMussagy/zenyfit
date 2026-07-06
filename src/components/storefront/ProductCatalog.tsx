@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Star, Eye } from 'lucide-react';
+import { ShoppingCart, Star, Eye, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -120,8 +120,16 @@ export default function ProductCatalog() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-zeny-green-dark/40 text-lg">Nenhum produto encontrado</p>
+        <div className="text-center py-20">
+          <div className="w-20 h-20 rounded-full bg-zeny-green-card flex items-center justify-center mx-auto mb-4">
+            <Package className="w-10 h-10 text-zeny-green/30" />
+          </div>
+          <p className="text-zeny-green-dark/50 text-lg font-medium mb-2">
+            {products.length === 0 ? 'Nenhum produto disponível ainda' : 'Nenhum produto encontrado'}
+          </p>
+          <p className="text-zeny-green-dark/30 text-sm">
+            {products.length === 0 ? 'Os produtos serão adicionados em breve pela equipa ZenyFit' : 'Tente outra pesquisa ou categoria'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -135,7 +143,6 @@ export default function ProductCatalog() {
             >
               {/* Image */}
               <div className="relative aspect-square overflow-hidden bg-zeny-green-card">
-                <div className="absolute inset-0 flex items-center justify-center text-zeny-green/30">
                   <img
                     src={product.image}
                     alt={product.name}
@@ -143,10 +150,12 @@ export default function ProductCatalog() {
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
-                      (target.parentElement as HTMLElement).innerHTML = '<div class="flex items-center justify-center w-full h-full bg-zeny-green-card"><svg class="w-12 h-12 text-zeny-green/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector('.img-fallback')) {
+                        parent.innerHTML = '<div class="img-fallback flex items-center justify-center w-full h-full bg-zeny-green-card"><svg class="w-12 h-12 text-zeny-green/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
+                      }
                     }}
                   />
-                </div>
                 {product.featured && (
                   <Badge className="absolute top-3 left-3 bg-zeny-green text-white text-[10px]">
                     Destaque
