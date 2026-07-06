@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { supabase } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -8,27 +8,21 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const featured = searchParams.get('featured');
 
-    const where: Record<string, unknown> = {};
+    let query = supabase.from('Product').select('*').order('createdAt', { ascending: false });
 
     if (category && category !== 'Todos') {
-      where.category = category;
+      query = query.eq('category', category);
     }
     if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
-      ];
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     }
     if (featured === 'true') {
-      where.featured = true;
+      query = query.eq('featured', true);
     }
 
-    const products = await db.product.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return NextResponse.json(products);
+    const { data, error } = await query;
+    if (error) throw error;
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
@@ -40,19 +34,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, description, price, image, category, inStock, featured } = body;
 
-    const product = await db.product.create({
-      data: {
-        name,
-        description,
-        price: parseFloat(price),
-        image,
-        category,
-        inStock: inStock ?? true,
-        featured: featured ?? false,
-      },
-    });
+    const { data, error } = await supabase.from('Product').insert({
+      name,
+      description,
+      price: parseFloat(price),
+      image: image || '',
+      category,
+      inStock: inStock ?? true,
+      featured: featured ?? false,
+    }).select().single();
 
-    return NextResponse.json(product, { status: 201 });
+    if (error) throw error;
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error('Error creating product:', error);
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
