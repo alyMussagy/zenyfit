@@ -1,12 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Package, ShoppingCart, DollarSign, Clock, TrendingUp, BarChart3 } from 'lucide-react';
+import { useState } from 'react';
+import { Package, ShoppingCart, DollarSign, Clock, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import ProductManager from './ProductManager';
 import OrderManager from './OrderManager';
@@ -57,10 +53,10 @@ export default function Dashboard() {
       <div className="min-h-screen bg-gray-50 pt-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-48" />
+            <div className="h-8 bg-zeny-green-card rounded w-48" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-28 bg-gray-200 rounded-xl" />
+                <div key={i} className="h-28 bg-zeny-green-card rounded-xl" />
               ))}
             </div>
           </div>
@@ -90,8 +86,8 @@ export default function Dashboard() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                 activeTab === tab.id
-                  ? 'bg-zeny-green text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-zeny-green text-white shadow-md shadow-zeny-green/20'
+                  : 'text-gray-600 hover:bg-zeny-green-card'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -112,8 +108,8 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-500">Total Produtos</p>
                       <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalProducts}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                      <Package className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 rounded-lg bg-zeny-green/10 flex items-center justify-center">
+                      <Package className="w-5 h-5 text-zeny-green" />
                     </div>
                   </div>
                 </CardContent>
@@ -125,8 +121,8 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-500">Total Pedidos</p>
                       <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalOrders}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <ShoppingCart className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 rounded-lg bg-zeny-green/10 flex items-center justify-center">
+                      <ShoppingCart className="w-5 h-5 text-zeny-green-dark" />
                     </div>
                   </div>
                 </CardContent>
@@ -138,8 +134,8 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-500">Pedidos Pendentes</p>
                       <p className="text-2xl font-bold text-gray-900 mt-1">{stats.pendingOrders}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                    <div className="w-10 h-10 rounded-lg bg-zeny-green-card flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-zeny-green-dark" />
                     </div>
                   </div>
                 </CardContent>
@@ -153,8 +149,8 @@ export default function Dashboard() {
                         {stats.totalRevenue.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                       </p>
                     </div>
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <DollarSign className="w-5 h-5 text-emerald-600" />
+                    <div className="w-10 h-10 rounded-lg bg-zeny-green/10 flex items-center justify-center">
+                      <DollarSign className="w-5 h-5 text-zeny-green" />
                     </div>
                   </div>
                 </CardContent>
@@ -170,7 +166,9 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {stats.ordersByStatus.map((s) => {
+                    {stats.ordersByStatus.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-8">Sem pedidos registados ainda</p>
+                ) : stats.ordersByStatus.map((s) => {
                       const maxCount = Math.max(...stats.ordersByStatus.map((x) => x._count));
                       const pct = maxCount > 0 ? (s._count / maxCount) * 100 : 0;
                       return (
@@ -181,7 +179,7 @@ export default function Dashboard() {
                               className="h-full rounded-full transition-all duration-500"
                               style={{
                                 width: `${pct}%`,
-                                backgroundColor: s.status === 'pendente' ? '#f59e0b' : s.status === 'confirmado' ? '#3b82f6' : s.status === 'enviado' ? '#8b5cf6' : s.status === 'entregue' ? '#10b981' : '#ef4444',
+                                backgroundColor: s.status === 'pendente' ? '#f59e0b' : s.status === 'confirmado' ? '#2E9802' : s.status === 'enviado' ? '#38B802' : s.status === 'entregue' ? '#6FD63A' : '#ef4444',
                               }}
                             />
                           </div>
@@ -238,7 +236,10 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 {stats.recentOrders.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-8">Nenhum pedido registado</p>
+                  <div className="text-center py-12">
+                    <Package className="w-12 h-12 mx-auto mb-3 text-zeny-green/20" />
+                    <p className="text-sm text-gray-400">Nenhum pedido registado ainda</p>
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
