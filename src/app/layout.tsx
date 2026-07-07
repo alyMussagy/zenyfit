@@ -31,6 +31,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#38B802" />
+      </head>
       <body className={`${geistSans.variable} font-sans antialiased`}>
         {children}
         <Toaster />

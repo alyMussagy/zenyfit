@@ -8,8 +8,8 @@ import ScrollReveal, { StaggerContainer, StaggerItem } from './ScrollReveal';
 export default function Footer() {
   return (
     <footer id="contacto" className="bg-zeny-green-dark text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10" staggerDelay={0.12}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+        <StaggerContainer className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10" staggerDelay={0.12}>
           {/* Brand */}
           <StaggerItem variant="fadeUp">
             <div>
@@ -115,7 +115,7 @@ export default function Footer() {
       {/* Bottom Bar */}
       <ScrollReveal variant="fade" delay={0.2}>
         <div className="border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
             <p className="text-sm text-white/40">
               &copy; {new Date().getFullYear()} ZenyFit. Todos os direitos reservados.
             </p>

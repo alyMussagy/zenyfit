@@ -82,12 +82,12 @@ export default function ProductCatalog() {
   }, [products]);
 
   return (
-    <section id="produtos" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="produtos" className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Section Header */}
       <ScrollReveal variant="fadeUp" delay={0.1}>
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zeny-green-dark mb-3">Nossos Produtos</h2>
-          <p className="text-zeny-green-dark/60 max-w-lg mx-auto">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zeny-green-dark mb-3">Nossos Produtos</h2>
+          <p className="text-sm sm:text-base text-zeny-green-dark/60 max-w-lg mx-auto">
             Selecionamos os melhores produtos para cuidar da sua saúde, beleza e bem-estar
           </p>
         </div>
@@ -96,7 +96,7 @@ export default function ProductCatalog() {
       {/* Search & Filter */}
       <ScrollReveal variant="fadeUp" delay={0.2}>
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 max-w-full sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zeny-green/40" />
             <Input
               placeholder="Pesquisar produtos..."
@@ -105,12 +105,12 @@ export default function ProductCatalog() {
               className="pl-10 border-zeny-green/20 focus:border-zeny-green bg-white transition-colors duration-200"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 sm:flex-wrap overflow-x-auto sm:overflow-visible scroll-x-no-scrollbar pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
             {categories.map((cat, index) => (
               <motion.button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
                   activeCategory === cat
                     ? 'bg-zeny-green text-white shadow-md shadow-zeny-green/20'
                     : 'bg-white text-zeny-green-dark/70 hover:bg-zeny-green/10 border border-zeny-green/10'
@@ -135,9 +135,9 @@ export default function ProductCatalog() {
 
       {/* Product Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 overflow-hidden">
+            <div key={i} className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 overflow-hidden">
               <div className="aspect-square rounded-xl animate-shimmer" />
               <div className="mt-3 h-4 bg-zeny-green-card rounded w-3/4 animate-shimmer" />
               <div className="mt-2 h-3 bg-zeny-green-card rounded w-1/2 animate-shimmer" />
@@ -165,7 +165,7 @@ export default function ProductCatalog() {
         </ScrollReveal>
       ) : (
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6"
           layout
         >
           <AnimatePresence mode="popLayout">
@@ -181,7 +181,7 @@ export default function ProductCatalog() {
                   delay: index * 0.06,
                   ease: [0.25, 0.4, 0.25, 1],
                 }}
-                className="group bg-white rounded-2xl overflow-hidden border border-zeny-green/5 card-hover-lift"
+                className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-zeny-green/5 card-hover-lift"
               >
                 {/* Image */}
                 <div className="relative aspect-square overflow-hidden bg-zeny-green-card">
@@ -240,19 +240,19 @@ export default function ProductCatalog() {
                 </div>
 
                 {/* Info */}
-                <div className="p-4">
+                <div className="p-3 sm:p-4">
                   <motion.p
-                    className="text-xs text-zeny-green font-medium uppercase tracking-wider mb-1"
+                    className="text-[10px] sm:text-xs text-zeny-green font-medium uppercase tracking-wider mb-0.5 sm:mb-1"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 + index * 0.06 }}
                   >
                     {product.category}
                   </motion.p>
-                  <h3 className="font-semibold text-zeny-green-dark text-sm leading-tight mb-2 line-clamp-2">{product.name}</h3>
-                  <p className="text-xs text-zeny-green-dark/50 mb-3 line-clamp-2">{product.description}</p>
+                  <h3 className="font-semibold text-zeny-green-dark text-xs sm:text-sm leading-tight mb-1 sm:mb-2 line-clamp-2">{product.name}</h3>
+                  <p className="text-[10px] sm:text-xs text-zeny-green-dark/50 mb-2 sm:mb-3 line-clamp-1 sm:line-clamp-2">{product.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-zeny-green-dark">
+                    <span className="text-sm sm:text-lg font-bold text-zeny-green-dark">
                       {product.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                     </span>
                     <motion.div
@@ -263,7 +263,7 @@ export default function ProductCatalog() {
                         size="icon"
                         onClick={() => handleAddToCart(product)}
                         disabled={!product.inStock}
-                        className="w-9 h-9 rounded-full bg-zeny-green hover:bg-zeny-green-dark text-white transition-colors duration-200"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zeny-green hover:bg-zeny-green-dark text-white transition-colors duration-200"
                       >
                         <ShoppingCart className="w-4 h-4" />
                       </Button>
@@ -280,7 +280,7 @@ export default function ProductCatalog() {
       <AnimatePresence>
         {selectedProduct && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -288,11 +288,11 @@ export default function ProductCatalog() {
             onClick={() => setSelectedProduct(null)}
           >
             <motion.div
-              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              initial={{ scale: 0.95, opacity: 0, y: 80 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              exit={{ scale: 0.95, opacity: 0, y: 80 }}
               transition={{ duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
-              className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl"
+              className="bg-white rounded-t-2xl sm:rounded-3xl max-w-lg w-full max-h-[85vh] sm:max-h-none overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="aspect-video bg-zeny-green-card relative">
@@ -318,14 +318,14 @@ export default function ProductCatalog() {
                   ✕
                 </motion.button>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
                 >
                   <Badge className="mb-3 bg-zeny-green/10 text-zeny-green hover:bg-zeny-green/20 text-xs">{selectedProduct.category}</Badge>
-                  <h3 className="text-xl font-bold text-zeny-green-dark mb-2">{selectedProduct.name}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-zeny-green-dark mb-2">{selectedProduct.name}</h3>
                   <p className="text-sm text-zeny-green-dark/60 mb-4 leading-relaxed">{selectedProduct.description}</p>
                   <div className="flex items-center gap-2 mb-6">
                     {[1,2,3,4,5].map((s, i) => (
@@ -349,14 +349,14 @@ export default function ProductCatalog() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <span className="text-2xl font-bold text-zeny-green-dark">
+                  <span className="text-xl sm:text-2xl font-bold text-zeny-green-dark">
                     {selectedProduct.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                   </span>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       onClick={() => { handleAddToCart(selectedProduct); setSelectedProduct(null); }}
                       disabled={!selectedProduct.inStock}
-                      className="bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full px-6 transition-colors duration-200"
+                      className="bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base transition-colors duration-200"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Adicionar ao Carrinho

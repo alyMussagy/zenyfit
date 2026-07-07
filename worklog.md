@@ -70,3 +70,28 @@ Stage Summary:
 - Navbar gains scroll-aware shadow and smooth mobile menu transitions
 - FloatingButtons: WhatsApp entrance animation + new ScrollToTop button
 - Build passes clean with zero errors
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Mobile responsiveness — test and fix all storefront components
+
+Work Log:
+- Added global CSS: `-webkit-tap-highlight-color: transparent`, `touch-action: manipulation` on buttons/links/inputs, `scrollbar-width: none` utility, `.safe-bottom/.safe-left/.safe-right` for notched phones, `@media (hover: none)` to disable card-hover-lift on touch devices
+- Added `viewport-fit=cover` and `theme-color` meta tags in layout.tsx
+- HeroSection: `min-h-[100dvh]` for dynamic viewport height (avoids address bar overlap), reduced pt/pb on mobile, CTA buttons `px-6 sm:px-8 text-sm sm:text-base`, feature bar `grid-cols-3` on mobile (3 items per row, no orphan), smaller feature text `text-[10px]`
+- ProductCatalog: 2-column grid on mobile (`grid-cols-2` with `gap-3`), categories scroll horizontally on mobile (`.scroll-x-no-scrollbar`, `whitespace-nowrap`), search `max-w-full sm:max-w-md`, product card text scales down (`text-[10px]/xs/sm`), cart button `w-8 h-8 sm:w-9`, product detail modal slides from bottom on mobile (`items-end`, `rounded-t-2xl`, `max-h-[85vh]`), button text smaller on mobile
+- AboutSection: reduced section padding `py-12 sm:py-20`, grid gap `gap-10 sm:gap-16`, stats panel `p-8 sm:p-12 min-h-[260px] sm:min-h-[400px]`, heart icon `w-16 sm:w-24`, "Why Choose Us" card `p-6 sm:p-8 lg:p-12`, heading `text-xl sm:text-2xl`
+- Footer: 2-column grid on mobile (`grid-cols-2`), reduced padding `py-10 sm:py-16`, gap `gap-8 sm:gap-10`, bottom bar `py-4 sm:py-6`
+- CheckoutModal: bottom sheet on mobile (`items-end`, `rounded-t-2xl`, `max-h-[92vh]`), larger close button `w-10 h-10`, select height `h-11 rounded-lg`, smaller form padding `p-3 sm:p-4`, shortened payment text
+- CartDrawer: quantity buttons increased from `w-7 h-7` to `w-9 h-9` (36px touch target), delete button also `w-9 h-9` with `active:` states
+- FloatingButtons: `bottom-4 right-4 sm:bottom-6 sm:right-6`, tooltip hidden on mobile (`hidden sm:block`), safe area classes
+
+Stage Summary:
+- All components now fully responsive from 320px (iPhone SE) to desktop
+- Touch targets minimum 36px for all interactive elements
+- Product grid 2 columns on mobile, modal slides from bottom
+- Categories scroll horizontally instead of wrapping
+- Safe area support for iPhone notch/dynamic island
+- No hover effects on touch devices (hover: none media query)
+- Build passes clean

@@ -87,9 +87,16 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     @apply bg-zeny-cream text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Prevent double-tap zoom on interactive elements */
+  button, a, [role="button"], input, select, textarea {
+    touch-action: manipulation;
   }
 }
 
@@ -210,4 +217,33 @@ html {
 
 .animate-fade-in-scale {
   animation: fadeInScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Safe area for notched phones */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.safe-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Horizontal scroll container for mobile categories */
+.scroll-x-no-scrollbar {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-x-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-first: disable hover lift on touch devices */
+@media (hover: none) {
+  .card-hover-lift:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }

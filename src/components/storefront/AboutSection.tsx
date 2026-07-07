@@ -6,14 +6,14 @@ import ScrollReveal, { StaggerContainer, StaggerItem } from './ScrollReveal';
 
 export default function AboutSection() {
   return (
-    <section id="sobre" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="sobre" className="py-12 sm:py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* About */}
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+        <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center mb-12 sm:mb-20">
           <div>
             <ScrollReveal variant="fadeLeft" delay={0.1}>
-              <div className="w-16 h-16 rounded-full bg-zeny-green-card flex items-center justify-center mb-6">
-                <svg viewBox="0 0 60 60" className="w-10 h-10" fill="none">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-zeny-green-card flex items-center justify-center mb-4 sm:mb-6">
+                <svg viewBox="0 0 60 60" className="w-8 h-8 sm:w-10 sm:h-10" fill="none">
                   <circle cx="30" cy="30" r="28" stroke="#2E9802" strokeWidth="2" />
                   <text x="30" y="38" textAnchor="middle" fill="#2E9802" fontSize="26" fontWeight="bold" fontFamily="sans-serif">Z</text>
                   <path d="M40 18 C48 24, 50 32, 44 42 C38 34, 34 26, 40 18Z" fill="#38B802" />
@@ -25,7 +25,7 @@ export default function AboutSection() {
             </ScrollReveal>
 
             <ScrollReveal variant="fadeLeft" delay={0.2}>
-              <h2 className="text-3xl sm:text-4xl font-bold text-zeny-green-dark mb-6">Sobre a ZenyFit</h2>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zeny-green-dark mb-4 sm:mb-6">Sobre a ZenyFit</h2>
             </ScrollReveal>
 
             <ScrollReveal variant="fadeLeft" delay={0.3}>
@@ -66,18 +66,18 @@ export default function AboutSection() {
 
           <ScrollReveal variant="fadeRight" delay={0.2}>
             <div className="relative">
-              <div className="bg-gradient-to-br from-zeny-green/10 to-zeny-green-light/20 rounded-3xl p-12 flex items-center justify-center min-h-[400px]">
+              <div className="bg-gradient-to-br from-zeny-green/10 to-zeny-green-light/20 rounded-2xl sm:rounded-3xl p-8 sm:p-12 flex items-center justify-center min-h-[260px] sm:min-h-[400px]">
                 <div className="text-center">
                   <motion.div
-                    className="w-24 h-24 rounded-full bg-white/80 flex items-center justify-center mx-auto mb-6 shadow-lg"
+                    className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white/80 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg"
                     whileInView={{ scale: [0.8, 1.05, 1] }}
                     transition={{ duration: 0.6, ease: 'easeOut' }}
                     viewport={{ once: true }}
                   >
-                    <Heart className="w-12 h-12 text-zeny-green" />
+                    <Heart className="w-8 h-8 sm:w-12 sm:h-12 text-zeny-green" />
                   </motion.div>
                   <motion.p
-                    className="text-2xl font-bold text-zeny-green-dark mb-2"
+                    className="text-xl sm:text-2xl font-bold text-zeny-green-dark mb-2"
                     initial={{ opacity: 0, scale: 0.5 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 200 }}
@@ -114,7 +114,7 @@ export default function AboutSection() {
 
         {/* Why Choose Us */}
         <ScrollReveal variant="scale" delay={0.1}>
-          <div className="bg-zeny-green rounded-3xl p-8 sm:p-12 text-white overflow-hidden relative">
+          <div className="bg-zeny-green rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 text-white overflow-hidden relative">
             {/* Subtle background pattern */}
             <div className="absolute inset-0 opacity-5">
               <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white translate-x-1/3 -translate-y-1/3" />
@@ -123,7 +123,7 @@ export default function AboutSection() {
 
             <div className="relative">
               <ScrollReveal variant="fadeUp" delay={0.15}>
-                <h3 className="text-2xl sm:text-3xl font-bold text-center mb-10">Porquê Escolher a ZenyFit?</h3>
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center mb-8 sm:mb-10">Porquê Escolher a ZenyFit?</h3>
               </ScrollReveal>
 
               <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" staggerDelay={0.12}>

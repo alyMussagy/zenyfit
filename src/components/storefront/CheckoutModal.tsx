@@ -75,7 +75,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
         clearCart();
         onClose();
 
-        // Show success toast with WhatsApp option
         toast.success('Pedido realizado com sucesso!', {
           description: 'Pode confirmar pelo WhatsApp para acompanhamento mais rápido.',
           duration: 8000,
@@ -95,18 +94,18 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
-      <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-3xl max-w-md w-full max-h-[92vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="sticky top-0 bg-white p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-3xl z-10">
-          <h2 className="text-lg font-bold text-zeny-green-dark">Finalizar Pedido</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-zeny-green-card flex items-center justify-center">
-            <X className="w-4 h-4 text-zeny-green-dark/60" />
+        <div className="sticky top-0 bg-white p-3 sm:p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-2xl sm:rounded-t-3xl z-10">
+          <h2 className="text-base sm:text-lg font-bold text-zeny-green-dark">Finalizar Pedido</h2>
+          <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-zeny-green-card flex items-center justify-center -mr-1">
+            <X className="w-5 h-5 text-zeny-green-dark/60" />
           </button>
         </div>
 
         {/* Order Summary */}
-        <div className="p-4 bg-zeny-green-card/30">
+        <div className="p-3 sm:p-4 bg-zeny-green-card/30">
           <p className="text-sm font-medium text-zeny-green-dark/60 mb-2">{items.length} item(ns) no carrinho</p>
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {items.map((item) => (
@@ -120,19 +119,19 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
           </div>
           <div className="flex justify-between mt-3 pt-3 border-t border-zeny-green/10">
             <span className="font-bold text-zeny-green-dark">Total</span>
-            <span className="font-bold text-zeny-green text-lg">{totalPrice().toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}</span>
+            <span className="font-bold text-zeny-green text-base sm:text-lg">{totalPrice().toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}</span>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 space-y-3 sm:space-y-4">
           <div>
             <Label className="text-zeny-green-dark text-sm font-medium">Nome Completo *</Label>
             <Input
               value={form.customerName}
               onChange={(e) => setForm({ ...form, customerName: e.target.value })}
               placeholder="Seu nome completo"
-              className="mt-1.5 border-zeny-green/20"
+              className="mt-1.5 h-11 rounded-lg border-zeny-green/20"
               required
             />
           </div>
@@ -143,7 +142,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               value={form.customerPhone}
               onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
               placeholder="84 XXX XXXX ou 86 XXX XXXX"
-              className="mt-1.5 border-zeny-green/20"
+              className="mt-1.5 h-11 rounded-lg border-zeny-green/20"
               required
             />
           </div>
@@ -153,7 +152,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             <select
               value={form.province}
               onChange={(e) => setForm({ ...form, province: e.target.value })}
-              className="mt-1.5 w-full h-10 rounded-md border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
+              className="mt-1.5 w-full h-11 rounded-lg border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
               required
             >
               <option value="">Selecione a província</option>
@@ -169,7 +168,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
               placeholder="Ex: Matola, Beira, Nampula..."
-              className="mt-1.5 border-zeny-green/20"
+              className="mt-1.5 h-11 rounded-lg border-zeny-green/20"
               required
             />
           </div>
@@ -180,7 +179,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
               placeholder="Rua, bairro, número de casa..."
-              className="mt-1.5 w-full min-h-[80px] rounded-md border border-zeny-green/20 bg-white px-3 py-2 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none"
+              className="mt-1.5 w-full min-h-[72px] sm:min-h-[80px] rounded-lg border border-zeny-green/20 bg-white px-3 py-2 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none"
               required
             />
           </div>
@@ -189,7 +188,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             <CheckCircle className="w-5 h-5 text-zeny-green mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-sm font-medium text-zeny-green-dark">Pagamento na Entrega</p>
-              <p className="text-xs text-zeny-green-dark/50 mt-0.5">Pague apenas quando receber os seus produtos no endereço indicado</p>
+              <p className="text-xs text-zeny-green-dark/50 mt-0.5">Pague apenas quando receber os seus produtos</p>
             </div>
           </div>
 

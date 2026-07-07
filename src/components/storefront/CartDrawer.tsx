@@ -58,23 +58,23 @@ export default function CartDrawer() {
               <p className="text-sm font-bold text-zeny-green mt-1">
                 {item.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
               </p>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-3 mt-2">
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="w-7 h-7 rounded-full border border-zeny-green/20 flex items-center justify-center hover:bg-zeny-green/10"
+                  className="w-9 h-9 rounded-full border border-zeny-green/20 flex items-center justify-center hover:bg-zeny-green/10 active:bg-zeny-green/15"
                 >
-                  <Minus className="w-3 h-3" />
+                  <Minus className="w-4 h-4" />
                 </button>
                 <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="w-7 h-7 rounded-full border border-zeny-green/20 flex items-center justify-center hover:bg-zeny-green/10"
+                  className="w-9 h-9 rounded-full border border-zeny-green/20 flex items-center justify-center hover:bg-zeny-green/10 active:bg-zeny-green/15"
                 >
-                  <Plus className="w-3 h-3" />
+                  <Plus className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => removeItem(item.id)}
-                  className="ml-auto text-red-400 hover:text-red-500"
+                  className="ml-auto w-9 h-9 flex items-center justify-center text-red-400 hover:text-red-500 active:text-red-600"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

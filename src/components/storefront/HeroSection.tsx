@@ -13,7 +13,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-zeny-cream">
+    <section id="hero" className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-zeny-cream">
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Decorative circles with parallax feel */}
@@ -54,7 +54,7 @@ export default function HeroSection() {
         </motion.svg>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-8 sm:pb-12">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left - Brand */}
           <div>
@@ -79,7 +79,7 @@ export default function HeroSection() {
                 </div>
               </div>
               <div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zeny-green-dark tracking-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-zeny-green-dark tracking-tight">
                   Zeny<span className="text-zeny-green">Fit</span>
                 </h1>
                 <p className="text-sm sm:text-base font-medium text-zeny-green-dark tracking-wider uppercase mt-1">
@@ -99,14 +99,14 @@ export default function HeroSection() {
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-wrap gap-4 mb-12"
+              className="flex flex-wrap gap-3 sm:gap-4 mb-8 sm:mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
             >
               <a href="#produtos">
                 <motion.button
-                  className="px-8 py-3 bg-zeny-green text-white rounded-full font-medium shadow-lg shadow-zeny-green/20"
+                  className="px-6 sm:px-8 py-3 bg-zeny-green text-white rounded-full font-medium shadow-lg shadow-zeny-green/20 text-sm sm:text-base"
                   whileHover={{ scale: 1.03, boxShadow: '0 20px 40px rgba(56, 184, 2, 0.3)' }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 15 }}
@@ -116,7 +116,7 @@ export default function HeroSection() {
               </a>
               <a href="#sobre">
                 <motion.button
-                  className="px-8 py-3 border-2 border-zeny-green/30 text-zeny-green-dark rounded-full font-medium"
+                  className="px-6 sm:px-8 py-3 border-2 border-zeny-green/30 text-zeny-green-dark rounded-full font-medium text-sm sm:text-base"
                   whileHover={{ scale: 1.03, backgroundColor: 'rgba(56, 184, 2, 0.05)' }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 15 }}
@@ -135,7 +135,7 @@ export default function HeroSection() {
             >
               <div className="flex items-center gap-2">
                 <Truck className="w-4 h-4 text-zeny-green" />
-                <span>Entrega para todo o país</span>
+                <span className="text-xs sm:text-sm">Entrega para todo o país</span>
               </div>
               <div className="hidden sm:flex items-center gap-2">
                 <Shield className="w-4 h-4 text-zeny-green" />
@@ -203,8 +203,8 @@ export default function HeroSection() {
         transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
       >
         <div className="bg-zeny-green">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div className="grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-center gap-4 sm:gap-10">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.label}
@@ -220,7 +220,7 @@ export default function HeroSection() {
                   >
                     <feature.icon className="w-5 h-5 text-white" />
                   </motion.div>
-                  <span className="text-xs sm:text-sm font-medium text-white text-center">{feature.label}</span>
+                  <span className="text-[10px] sm:text-xs sm:text-sm font-medium text-white text-center leading-tight">{feature.label}</span>
                 </motion.div>
               ))}
             </div>
