@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Leaf, Heart, Sparkles, Shield, Lightbulb, Truck } from 'lucide-react';
 
 export default function HeroSection() {
@@ -15,28 +16,55 @@ export default function HeroSection() {
     <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-zeny-cream">
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Decorative circles */}
-        <div className="absolute top-20 right-10 w-64 h-64 rounded-full bg-zeny-green/5 blur-2xl" />
-        <div className="absolute bottom-40 right-20 w-96 h-96 rounded-full bg-zeny-green/8 blur-3xl" />
-        <div className="absolute top-40 left-10 w-48 h-48 rounded-full bg-zeny-green-light/5 blur-2xl" />
-        
+        {/* Decorative circles with parallax feel */}
+        <motion.div
+          className="absolute top-20 right-10 w-64 h-64 rounded-full bg-zeny-green/5 blur-2xl"
+          animate={{ y: [0, -15, 0], scale: [1, 1.05, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute bottom-40 right-20 w-96 h-96 rounded-full bg-zeny-green/8 blur-3xl"
+          animate={{ y: [0, -10, 0], scale: [1, 1.03, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-40 left-10 w-48 h-48 rounded-full bg-zeny-green-light/5 blur-2xl"
+          animate={{ y: [0, -12, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+        />
+
         {/* Leaf decorations */}
-        <svg className="absolute top-16 right-8 w-20 h-20 text-zeny-green/20 animate-leaf-sway leaf-decoration" viewBox="0 0 100 100" fill="currentColor">
+        <motion.svg
+          className="absolute top-16 right-8 w-20 h-20 text-zeny-green/20 leaf-decoration"
+          viewBox="0 0 100 100" fill="currentColor"
+          animate={{ rotate: [-5, 5, -5] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <path d="M50 10 C70 30, 90 50, 70 80 C50 60, 30 40, 50 10 Z" />
           <path d="M50 10 C50 30, 55 50, 70 80" stroke="rgba(255,255,255,0.3)" strokeWidth="1" fill="none" />
-        </svg>
-        <svg className="absolute bottom-32 left-6 w-16 h-16 text-zeny-green/15 animate-leaf-sway leaf-decoration" style={{ animationDelay: '1s' }} viewBox="0 0 100 100" fill="currentColor">
+        </motion.svg>
+        <motion.svg
+          className="absolute bottom-32 left-6 w-16 h-16 text-zeny-green/15 leaf-decoration"
+          viewBox="0 0 100 100" fill="currentColor"
+          animate={{ rotate: [-3, 6, -3] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        >
           <path d="M30 80 C50 60, 70 40, 60 15 C40 35, 20 55, 30 80 Z" />
           <path d="M30 80 C45 60, 55 40, 60 15" stroke="rgba(255,255,255,0.3)" strokeWidth="1" fill="none" />
-        </svg>
+        </motion.svg>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left - Brand */}
-          <div className="animate-fade-in-up">
+          <div>
             {/* Logo Mark */}
-            <div className="flex items-center gap-3 mb-6">
+            <motion.div
+              className="flex items-center gap-3 mb-6"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
+            >
               <div className="relative w-16 h-16">
                 <div className="absolute inset-0 rounded-full bg-zeny-green-card flex items-center justify-center">
                   <svg viewBox="0 0 60 60" className="w-10 h-10" fill="none">
@@ -58,28 +86,53 @@ export default function HeroSection() {
                   Saúde, Equilíbrio e Autoestima
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <p className="text-base sm:text-lg text-zeny-green-dark/70 leading-relaxed max-w-md mb-8">
-              Mais saúde, equilíbrio e autoestima para uma vida leve e plena. Produtos selecionados para cuidar da sua pele, corpo e bem-estar.
-            </p>
+            <motion.p
+              className="text-base sm:text-lg text-zeny-green-dark/70 leading-relaxed max-w-md mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.4, 0.25, 1] }}
+            >
+              Mais saúde, equilíbrio e autoestima para uma vida leve e plena. Produtos seleccionados para cuidar da sua pele, corpo e bem-estar.
+            </motion.p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 mb-12">
+            <motion.div
+              className="flex flex-wrap gap-4 mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+            >
               <a href="#produtos">
-                <button className="px-8 py-3 bg-zeny-green text-white rounded-full font-medium hover:bg-zeny-green-dark transition-all shadow-lg shadow-zeny-green/20 hover:shadow-xl hover:shadow-zeny-green/30 transform hover:-translate-y-0.5">
+                <motion.button
+                  className="px-8 py-3 bg-zeny-green text-white rounded-full font-medium shadow-lg shadow-zeny-green/20"
+                  whileHover={{ scale: 1.03, boxShadow: '0 20px 40px rgba(56, 184, 2, 0.3)' }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                >
                   Ver Produtos
-                </button>
+                </motion.button>
               </a>
               <a href="#sobre">
-                <button className="px-8 py-3 border-2 border-zeny-green/30 text-zeny-green-dark rounded-full font-medium hover:bg-zeny-green/5 transition-all">
+                <motion.button
+                  className="px-8 py-3 border-2 border-zeny-green/30 text-zeny-green-dark rounded-full font-medium"
+                  whileHover={{ scale: 1.03, backgroundColor: 'rgba(56, 184, 2, 0.05)' }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                >
                   Sobre Nós
-                </button>
+                </motion.button>
               </a>
-            </div>
+            </motion.div>
 
             {/* Quick Info */}
-            <div className="flex items-center gap-6 text-sm text-zeny-green-dark/60">
+            <motion.div
+              className="flex items-center gap-6 text-sm text-zeny-green-dark/60"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.45 }}
+            >
               <div className="flex items-center gap-2">
                 <Truck className="w-4 h-4 text-zeny-green" />
                 <span>Entrega para todo o país</span>
@@ -88,48 +141,87 @@ export default function HeroSection() {
                 <Shield className="w-4 h-4 text-zeny-green" />
                 <span>Pagamento na entrega</span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right - Visual */}
-          <div className="hidden lg:flex justify-center items-center relative">
+          <motion.div
+            className="hidden lg:flex justify-center items-center relative"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
+          >
             <div className="relative">
               {/* Background circle */}
-              <div className="w-80 h-80 rounded-full bg-zeny-green/10 flex items-center justify-center">
-                <div className="w-64 h-64 rounded-full bg-zeny-green/15 flex items-center justify-center animate-float">
-                  <div className="w-48 h-48 rounded-full bg-gradient-to-br from-zeny-green/20 to-zeny-green-light/30 flex items-center justify-center">
+              <motion.div
+                className="w-80 h-80 rounded-full bg-zeny-green/10 flex items-center justify-center"
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+              >
+                <div className="w-64 h-64 rounded-full bg-zeny-green/15 flex items-center justify-center">
+                  <motion.div
+                    className="w-48 h-48 rounded-full bg-gradient-to-br from-zeny-green/20 to-zeny-green-light/30 flex items-center justify-center"
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  >
                     <div className="text-center">
                       <Leaf className="w-16 h-16 text-zeny-green-dark/40 mx-auto mb-2" />
                       <p className="text-zeny-green-dark/50 text-sm font-medium">Bem-estar Natural</p>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Cursive text overlay */}
-              <div className="absolute -right-8 top-1/3 transform -translate-y-1/2">
+              <motion.div
+                className="absolute -right-8 top-1/3 transform -translate-y-1/2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
                 <p className="text-xl text-zeny-green/60 italic font-light whitespace-nowrap">
                   &ldquo;Você no seu melhor todos os dias&rdquo;
                 </p>
-                <Heart className="w-5 h-5 text-zeny-green/40 mt-2" />
-              </div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1, type: 'spring', stiffness: 300, damping: 10 }}
+                >
+                  <Heart className="w-5 h-5 text-zeny-green/40 mt-2" />
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Feature Bar */}
-      <div className="relative mt-auto">
+      <motion.div
+        className="relative mt-auto"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
+      >
         <div className="bg-zeny-green">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
-              {features.map((feature) => (
-                <div key={feature.label} className="flex flex-col items-center gap-2 group">
-                  <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center group-hover:bg-white/25 transition-colors">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={feature.label}
+                  className="flex flex-col items-center gap-2 group"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.7 + index * 0.08 }}
+                >
+                  <motion.div
+                    className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center"
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255,255,255,0.25)' }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                  >
                     <feature.icon className="w-5 h-5 text-white" />
-                  </div>
+                  </motion.div>
                   <span className="text-xs sm:text-sm font-medium text-white text-center">{feature.label}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -140,7 +232,7 @@ export default function HeroSection() {
             </svg>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

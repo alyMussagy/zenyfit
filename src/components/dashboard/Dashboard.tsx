@@ -332,6 +332,7 @@ export default function Dashboard() {
         {activeTab === 'orders' && <OrderManager />}
         {activeTab === 'admins' && <AdminManager />}
       </div>
+      </div>
     </div>
   );
 }

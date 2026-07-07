@@ -11,7 +11,7 @@ import AboutSection from '@/components/storefront/AboutSection';
 import Footer from '@/components/storefront/Footer';
 import Dashboard from '@/components/dashboard/Dashboard';
 import LoginScreen from '@/components/dashboard/LoginScreen';
-import WhatsAppButton from '@/components/storefront/WhatsAppButton';
+import FloatingButtons from '@/components/storefront/WhatsAppButton';
 
 function StoreView() {
   return (
@@ -22,7 +22,7 @@ function StoreView() {
         <AboutSection />
       </main>
       <Footer />
-      <WhatsAppButton />
+      <FloatingButtons />
     </div>
   );
 }
