@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut } from 'lucide-react';
+import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import ProductManager from './ProductManager';
 import OrderManager from './OrderManager';
 import AdminManager from './AdminManager';
 import { useAuthStore } from '@/store/auth-store';
+import { useAppStore } from '@/store/app-store';
 
 interface DashboardStats {
   totalProducts: number;
@@ -45,7 +46,13 @@ const statusColors: Record<string, string> = {
 export default function Dashboard() {
   const admin = useAuthStore((s) => s.admin);
   const logout = useAuthStore((s) => s.logout);
+  const setView = useAppStore((s) => s.setView);
   const [activeTab, setActiveTab] = useState<DashTab>('overview');
+
+  const handleLogout = () => {
+    logout();
+    setView('store');
+  };
 
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard'],
@@ -70,7 +77,36 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 px-4 sm:px-6 lg:px-8 pb-12">
+    <div className="min-h-screen bg-gray-50">
+      {/* Dashboard Top Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-zeny-green/10 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-zeny-green" />
+            </div>
+            <span className="text-lg font-bold text-gray-900 tracking-tight">Zeny<span className="text-zeny-green">Fit</span> <span className="text-xs font-normal text-gray-400">Admin</span></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setView('store')}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-zeny-green-dark px-3 py-1.5 rounded-lg hover:bg-zeny-green/5 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Loja</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sair</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="pt-20 px-4 sm:px-6 lg:px-8 pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -81,14 +117,6 @@ export default function Dashboard() {
               </div>
               <p className="text-gray-500 mt-1">Gerir produtos, pedidos e acompanhar vendas</p>
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-500 transition-colors"
-              title="Sair do painel"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Sair</span>
-            </button>
           </div>
 
         {/* Tabs */}
