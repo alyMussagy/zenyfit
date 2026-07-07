@@ -1,14 +1,16 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
+import { useAuthStore } from '@/store/auth-store';
 import Navbar from '@/components/storefront/Navbar';
 import HeroSection from '@/components/storefront/HeroSection';
 import ProductCatalog from '@/components/storefront/ProductCatalog';
 import AboutSection from '@/components/storefront/AboutSection';
 import Footer from '@/components/storefront/Footer';
 import Dashboard from '@/components/dashboard/Dashboard';
+import LoginScreen from '@/components/dashboard/LoginScreen';
 import WhatsAppButton from '@/components/storefront/WhatsAppButton';
 
 function StoreView() {
@@ -25,6 +27,21 @@ function StoreView() {
   );
 }
 
+function DashboardView() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const checkSession = useAuthStore((s) => s.checkSession);
+
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
+
+  if (!isAuthenticated) {
+    return <LoginScreen onSuccess={() => {}} />;
+  }
+
+  return <Dashboard />;
+}
+
 export default function Home() {
   const { view } = useAppStore();
   const [queryClient] = useState(() => new QueryClient({
@@ -35,8 +52,14 @@ export default function Home() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Navbar />
-      {view === 'store' ? <StoreView /> : <Dashboard />}
+      {view === 'store' ? (
+        <>
+          <Navbar />
+          <StoreView />
+        </>
+      ) : (
+        <DashboardView />
+      )}
     </QueryClientProvider>
   );
 }

@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, ShoppingCart, DollarSign, Clock, BarChart3 } from 'lucide-react';
+import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import ProductManager from './ProductManager';
 import OrderManager from './OrderManager';
+import AdminManager from './AdminManager';
+import { useAuthStore } from '@/store/auth-store';
 
 interface DashboardStats {
   totalProducts: number;
@@ -30,7 +32,7 @@ interface Order {
   items: { productName: string; quantity: number; price: number }[];
 }
 
-type DashTab = 'overview' | 'products' | 'orders';
+type DashTab = 'overview' | 'products' | 'orders' | 'admins';
 
 const statusColors: Record<string, string> = {
   pendente: 'bg-amber-100 text-amber-700',
@@ -41,6 +43,8 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Dashboard() {
+  const admin = useAuthStore((s) => s.admin);
+  const logout = useAuthStore((s) => s.logout);
   const [activeTab, setActiveTab] = useState<DashTab>('overview');
 
   const { data: stats, isLoading } = useQuery<DashboardStats>({
@@ -69,10 +73,23 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50 pt-20 px-4 sm:px-6 lg:px-8 pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Painel de Controlo</h1>
-          <p className="text-gray-500 mt-1">Gerir produtos, pedidos e acompanhar vendas</p>
-        </div>
+        <div className="flex items-center justify-between mb-8">
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Painel de Controlo</h1>
+                <span className="text-xs bg-zeny-green/10 text-zeny-green-dark px-2 py-0.5 rounded-full font-medium">{admin?.name || 'Admin'}</span>
+              </div>
+              <p className="text-gray-500 mt-1">Gerir produtos, pedidos e acompanhar vendas</p>
+            </div>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-500 transition-colors"
+              title="Sair do painel"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sair</span>
+            </button>
+          </div>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-8 border-b border-gray-200 pb-3 overflow-x-auto">
@@ -80,6 +97,7 @@ export default function Dashboard() {
             { id: 'overview' as DashTab, label: 'Visão Geral', icon: BarChart3 },
             { id: 'products' as DashTab, label: 'Produtos', icon: Package },
             { id: 'orders' as DashTab, label: 'Pedidos', icon: ShoppingCart },
+            ...(admin?.role === 'owner' ? [{ id: 'admins' as DashTab, label: 'Acessos', icon: Shield }] : []),
           ].map((tab) => (
             <button
               key={tab.id}
@@ -284,6 +302,7 @@ export default function Dashboard() {
 
         {activeTab === 'products' && <ProductManager />}
         {activeTab === 'orders' && <OrderManager />}
+        {activeTab === 'admins' && <AdminManager />}
       </div>
     </div>
   );
