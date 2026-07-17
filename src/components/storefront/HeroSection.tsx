@@ -18,24 +18,24 @@ export default function HeroSection() {
       <div className="absolute inset-0 pointer-events-none">
         {/* Decorative circles with parallax feel */}
         <motion.div
-          className="absolute top-20 right-10 w-64 h-64 rounded-full bg-zeny-green/5 blur-2xl"
+          className="absolute top-20 right-10 w-32 sm:w-64 h-32 sm:h-64 rounded-full bg-zeny-green/5 blur-2xl"
           animate={{ y: [0, -15, 0], scale: [1, 1.05, 1] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute bottom-40 right-20 w-96 h-96 rounded-full bg-zeny-green/8 blur-3xl"
+          className="absolute -bottom-20 -right-20 sm:bottom-40 sm:right-20 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-zeny-green/8 blur-3xl"
           animate={{ y: [0, -10, 0], scale: [1, 1.03, 1] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
         />
         <motion.div
-          className="absolute top-40 left-10 w-48 h-48 rounded-full bg-zeny-green-light/5 blur-2xl"
+          className="absolute top-40 left-10 w-24 sm:w-48 h-24 sm:h-48 rounded-full bg-zeny-green-light/5 blur-2xl"
           animate={{ y: [0, -12, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
         />
 
         {/* Leaf decorations */}
         <motion.svg
-          className="absolute top-16 right-8 w-20 h-20 text-zeny-green/20 leaf-decoration"
+          className="absolute top-16 right-4 sm:right-8 w-12 sm:w-20 h-12 sm:h-20 text-zeny-green/20 leaf-decoration hidden sm:block"
           viewBox="0 0 100 100" fill="currentColor"
           animate={{ rotate: [-5, 5, -5] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -44,7 +44,7 @@ export default function HeroSection() {
           <path d="M50 10 C50 30, 55 50, 70 80" stroke="rgba(255,255,255,0.3)" strokeWidth="1" fill="none" />
         </motion.svg>
         <motion.svg
-          className="absolute bottom-32 left-6 w-16 h-16 text-zeny-green/15 leaf-decoration"
+          className="absolute bottom-32 left-2 sm:left-6 w-10 sm:w-16 h-10 sm:h-16 text-zeny-green/15 leaf-decoration hidden sm:block"
           viewBox="0 0 100 100" fill="currentColor"
           animate={{ rotate: [-3, 6, -3] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
@@ -220,7 +220,7 @@ export default function HeroSection() {
                   >
                     <feature.icon className="w-5 h-5 text-white" />
                   </motion.div>
-                  <span className="text-[10px] sm:text-xs sm:text-sm font-medium text-white text-center leading-tight">{feature.label}</span>
+                  <span className="text-[10px] sm:text-sm font-medium text-white text-center leading-tight">{feature.label}</span>
                 </motion.div>
               ))}
             </div>

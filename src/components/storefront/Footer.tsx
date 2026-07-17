@@ -9,8 +9,8 @@ export default function Footer() {
   return (
     <footer id="contacto" className="bg-zeny-green-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        <StaggerContainer className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10" staggerDelay={0.12}>
-          {/* Brand */}
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10" staggerDelay={0.12}>
+          {/* Brand & Categories - merged on mobile */}
           <StaggerItem variant="fadeUp">
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -27,6 +27,15 @@ export default function Footer() {
               <p className="text-sm text-white/60 leading-relaxed">
                 Saúde, Equilíbrio e Autoestima. Produtos seleccionados para cuidar de si, entregues em todo Moçambique.
               </p>
+              {/* Categories inline on mobile */}
+              <div className="sm:hidden mt-5 pt-5 border-t border-white/10">
+                <h4 className="font-semibold mb-3 text-zeny-green-light text-sm">Categorias</h4>
+                <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                  {['Skincare', 'Cuidados Corporais', 'Suplementos', 'Aromaterapia', 'Cabelo'].map((cat) => (
+                    <span key={cat} className="text-sm text-white/60">{cat}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </StaggerItem>
 
@@ -59,8 +68,8 @@ export default function Footer() {
             </div>
           </StaggerItem>
 
-          {/* Categories */}
-          <StaggerItem variant="fadeUp">
+          {/* Categories - hidden on mobile, merged into brand col */}
+          <StaggerItem variant="fadeUp" className="hidden sm:block">
             <div>
               <h4 className="font-semibold mb-4 text-zeny-green-light">Categorias</h4>
               <ul className="space-y-2">
@@ -119,9 +128,9 @@ export default function Footer() {
             <p className="text-sm text-white/40">
               &copy; {new Date().getFullYear()} ZenyFit. Todos os direitos reservados.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-4">
               <span className="text-xs text-white/30">Pagamento na entrega</span>
-              <span className="text-white/20">|</span>
+              <span className="text-white/20 hidden sm:inline">|</span>
               <span className="text-xs text-white/30">Entregas para todo Moçambique</span>
             </div>
           </div>

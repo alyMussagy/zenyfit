@@ -221,22 +221,17 @@ export default function ProductCatalog() {
                       <span className="text-white font-medium text-sm bg-black/60 px-3 py-1 rounded-full">Esgotado</span>
                     </motion.div>
                   )}
-                  {/* Quick actions */}
-                  <motion.div
-                    className="absolute bottom-3 right-3 flex gap-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileHover={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  {/* Quick actions - always visible on mobile, hover on desktop */}
+                  <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
                     <motion.button
                       onClick={() => setSelectedProduct(product)}
-                      className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 flex items-center justify-center shadow-md active:scale-90 transition-transform"
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      <Eye className="w-4 h-4 text-zeny-green-dark" />
+                      <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zeny-green-dark" />
                     </motion.button>
-                  </motion.div>
+                  </div>
                 </div>
 
                 {/* Info */}

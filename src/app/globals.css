@@ -247,3 +247,15 @@ html {
     box-shadow: none;
   }
 }
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Better touch scrolling */
+@supports (overscroll-behavior: contain) {
+  body {
+    overscroll-behavior-y: contain;
+  }
+}
