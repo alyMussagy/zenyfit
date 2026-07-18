@@ -27,6 +27,16 @@ export const ZENYFIT_CONFIG = {
     symbol: 'MTn',
   },
 
+  // Regras de entrega
+  delivery: {
+    // Pedido mínimo para activar entrega (evita viagens para pedidos de 100 MTn)
+    minimumOrder: 500,
+    // Acima deste valor a entrega é grátis
+    freeDeliveryAbove: 3000,
+    // Mensagem quando o pedido é inferior ao mínimo
+    minimumOrderMessage: 'O pedido mínimo para entrega é de 500,00 MTn. Adicione mais produtos ao carrinho.',
+  },
+
   // Zonas de entrega com custos
   // Base: Estádio da Machava — preços por distância real
   // Apenas Maputo Cidade e Matola por enquanto
