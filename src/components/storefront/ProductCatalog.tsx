@@ -37,8 +37,8 @@ export default function ProductCatalog() {
       try {
         const res = await fetch('/api/products');
         const data = await res.json();
-        setProducts(data);
-        setFiltered(data);
+        setProducts(Array.isArray(data) ? data : []);
+        setFiltered(Array.isArray(data) ? data : []);
       } catch {
         toast.error('Erro ao carregar produtos');
       } finally {

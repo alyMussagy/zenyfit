@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) throw error;
-    return NextResponse.json(data);
+    return NextResponse.json(Array.isArray(data) ? data : []);
   } catch (error) {
     console.error('Error fetching products:', error);
-    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    return NextResponse.json([]);
   }
 }
 
