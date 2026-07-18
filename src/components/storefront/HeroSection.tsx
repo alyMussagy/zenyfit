@@ -23,8 +23,8 @@ export default function HeroSection() {
           alt="ZenyFit"
           className="w-full h-full object-cover object-top sm:object-center"
         />
-        {/* Gradient overlay — stronger on mobile for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zeny-green-dark/95 via-zeny-green-dark/70 sm:via-zeny-green-dark/40 to-zeny-green-dark/40 sm:to-zeny-green-dark/20" />
+        {/* Gradient overlay — neutral dark for text readability, preserves banner colors */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 sm:via-black/35 to-black/30 sm:to-black/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 sm:from-black/30 to-transparent" />
       </div>
 
