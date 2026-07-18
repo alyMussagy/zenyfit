@@ -38,6 +38,14 @@
       "namedRegex": "^/api/orders/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/api/popups/[id]",
+      "regex": "^/api/popups/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/popups/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/api/products/[id]",
       "regex": "^/api/products/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -94,6 +102,12 @@
       "regex": "^/api/orders(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/orders(?:/)?$"
+    },
+    {
+      "page": "/api/popups",
+      "regex": "^/api/popups(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/popups(?:/)?$"
     },
     {
       "page": "/api/products",

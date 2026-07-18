@@ -3,18 +3,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, Check, Flame, Sparkles } from 'lucide-react';
-import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 
-const STORAGE_KEY = 'zenyfit-offer-dismissed';
-const { offerPopup } = ZENYFIT_CONFIG;
+const STORAGE_KEY = 'zenyfit-popup-dismissed';
 
-function shouldShow(): boolean {
-  if (!offerPopup.active) return false;
+interface PopupData {
+  id: string;
+  title: string;
+  subtitle: string;
+  benefits: string[];
+  stockAlert: string;
+  ctaText: string;
+  ctaLink: string;
+  footerText: string;
+  urgencyLabel: string;
+  cooldownHours: number;
+  active: boolean;
+}
+
+function shouldShow(cooldownHours: number): boolean {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return true;
   try {
     const dismissedAt = new Date(raw).getTime();
-    const cooldownMs = offerPopup.cooldownHours * 60 * 60 * 1000;
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    if (cooldownMs <= 0) return true; // 0 = sempre mostra
     return Date.now() - dismissedAt > cooldownMs;
   } catch {
     return true;
@@ -22,23 +34,50 @@ function shouldShow(): boolean {
 }
 
 export default function OfferPopup() {
+  const [popup, setPopup] = useState<PopupData | null>(null);
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // Buscar popup activo da API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (shouldShow()) setShow(true);
-    }, 2500); // aparece 2.5s depois da página carregar
-    return () => clearTimeout(timer);
+    async function fetchPopup() {
+      try {
+        const res = await fetch('/api/popups');
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0 && data[0].active) {
+          setPopup(data[0]);
+        }
+      } catch {
+        // Silencioso — se falhar, não mostra popup
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPopup();
   }, []);
+
+  // Mostrar popup depois do delay
+  useEffect(() => {
+    if (!popup || loading) return;
+    const timer = setTimeout(() => {
+      if (shouldShow(popup.cooldownHours)) {
+        setShow(true);
+      }
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [popup, loading]);
 
   const dismiss = useCallback(() => {
     setShow(false);
-    localStorage.setItem(STORAGE_KEY, new Date().toISOString());
-  }, []);
+    if (popup) {
+      localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+    }
+  }, [popup]);
 
   const handleCta = () => {
+    if (!popup) return;
     dismiss();
-    const link = offerPopup.ctaLink;
+    const link = popup.ctaLink;
     if (link.startsWith('#')) {
       const el = document.querySelector(link);
       el?.scrollIntoView({ behavior: 'smooth' });
@@ -46,6 +85,8 @@ export default function OfferPopup() {
       window.location.href = link;
     }
   };
+
+  if (loading || !popup) return null;
 
   return (
     <AnimatePresence>
@@ -76,7 +117,7 @@ export default function OfferPopup() {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 px-5 py-2.5 flex items-center justify-center gap-2">
               <Clock className="w-4 h-4 text-white/90" />
               <span className="text-sm font-semibold text-white tracking-wide">
-                {offerPopup.urgencyLabel}
+                {popup.urgencyLabel}
               </span>
             </div>
 
@@ -94,56 +135,66 @@ export default function OfferPopup() {
               <div className="text-center mb-4">
                 <div className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-3 py-1 mb-3">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Promoção</span>
+                  <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+                    Promoção
+                  </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 leading-tight">
-                  {offerPopup.title}
+                  {popup.title}
                 </h2>
               </div>
 
               {/* Subtitle */}
-              <p className="text-sm text-gray-600 text-center mb-5 leading-relaxed">
-                {offerPopup.subtitle}
-              </p>
+              {popup.subtitle && (
+                <p className="text-sm text-gray-600 text-center mb-5 leading-relaxed">
+                  {popup.subtitle}
+                </p>
+              )}
 
               {/* Benefits */}
-              <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">
-                  Por que escolher a ZenyFit:
-                </p>
-                <ul className="space-y-2">
-                  {offerPopup.benefits.map((benefit, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <div className="w-5 h-5 rounded-full bg-zeny-green/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Check className="w-3 h-3 text-zeny-green" strokeWidth={3} />
-                      </div>
-                      <span className="text-sm text-gray-700 leading-snug">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {popup.benefits?.length > 0 && (
+                <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2.5">
+                    Por que escolher a ZenyFit:
+                  </p>
+                  <ul className="space-y-2">
+                    {popup.benefits.map((benefit, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <div className="w-5 h-5 rounded-full bg-zeny-green/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 text-zeny-green" strokeWidth={3} />
+                        </div>
+                        <span className="text-sm text-gray-700 leading-snug">{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Stock alert */}
-              <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2.5 mb-5">
-                <Flame className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm font-medium text-orange-800">
-                  {offerPopup.stockAlert}
-                </p>
-              </div>
+              {popup.stockAlert && (
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2.5 mb-5">
+                  <Flame className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm font-medium text-orange-800">
+                    {popup.stockAlert}
+                  </p>
+                </div>
+              )}
 
               {/* CTA Button */}
               <button
                 onClick={handleCta}
                 className="w-full bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full py-4 text-base font-bold tracking-wide transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-zeny-green/25"
               >
-                {offerPopup.ctaText}
+                {popup.ctaText}
                 <span className="text-lg">&rarr;</span>
               </button>
 
               {/* Footer */}
-              <p className="text-center text-xs text-gray-400 mt-3">
-                {offerPopup.footerText}
-              </p>
+              {popup.footerText && (
+                <p className="text-center text-xs text-gray-400 mt-3">
+                  {popup.footerText}
+                </p>
+              )}
             </div>
           </motion.div>
         </div>

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft, Bell } from 'lucide-react';
+import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft, Bell, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ProductManager from './ProductManager';
 import OrderManager from './OrderManager';
 import AdminManager from './AdminManager';
+import PopupManager from './PopupManager';
 import { useAuthStore } from '@/store/auth-store';
 import { useAppStore } from '@/store/app-store';
 import { authFetch } from '@/lib/auth-fetch';
@@ -35,7 +36,7 @@ interface Order {
   items: { productName: string; quantity: number; price: number }[];
 }
 
-type DashTab = 'overview' | 'products' | 'orders' | 'admins';
+type DashTab = 'overview' | 'products' | 'orders' | 'popups' | 'admins';
 
 const statusColors: Record<string, string> = {
   pendente: 'bg-amber-100 text-amber-700',
@@ -152,6 +153,7 @@ export default function Dashboard() {
             { id: 'overview' as DashTab, label: 'Visão Geral', icon: BarChart3 },
             { id: 'products' as DashTab, label: 'Produtos', icon: Package },
             { id: 'orders' as DashTab, label: 'Pedidos', icon: ShoppingCart },
+            { id: 'popups' as DashTab, label: 'Popups', icon: Sparkles },
             ...(admin?.role === 'owner' ? [{ id: 'admins' as DashTab, label: 'Acessos', icon: Shield }] : []),
           ].map((tab) => (
             <button
@@ -357,6 +359,7 @@ export default function Dashboard() {
 
         {activeTab === 'products' && <ProductManager />}
         {activeTab === 'orders' && <OrderManager />}
+        {activeTab === 'popups' && <PopupManager />}
         {activeTab === 'admins' && <AdminManager />}
       </div>
       </div>

@@ -35,25 +35,4 @@ export const ZENYFIT_CONFIG = {
 
   // Categorias de produtos
   categories: ['Skincare', 'Corpo', 'Suplementos', 'Aromaterapia', 'Cabelo'],
-
-  // Popup de oferta — edite aqui para trocar a promoção activa
-  // Para desactivar, mude 'active' para false
-  offerPopup: {
-    active: true,
-    // Mostrar novamente depois de X horas (0 = mostrar sempre)
-    cooldownHours: 12,
-    title: 'Oferta Especial por Tempo Limitado!',
-    subtitle: 'Produtos seleccionados com até 30% de desconto. Só enquanto o stock durar.',
-    benefits: [
-      'Fórmulas naturais e seguras',
-      'Resultados visíveis em poucas semanas',
-      'Apoio personalizado via WhatsApp',
-      'Entrega rápida em Maputo e Matola',
-    ],
-    stockAlert: 'Várias opções já estão quase esgotadas esta semana',
-    ctaText: 'VER OFERTAS',
-    ctaLink: '#produtos',  // '#' para scroll, ou '/produto/id' para produto específico
-    footerText: 'Entrega em Maputo e Matola',
-    urgencyLabel: 'Oferta por tempo limitado',
-  },
 };

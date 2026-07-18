@@ -110,6 +110,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/api/popups/[id]/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/popups/[id]">> = Specific
+  const handler = {} as typeof import("../../src/app/api/popups/[id]/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/popups/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/popups">> = Specific
+  const handler = {} as typeof import("../../src/app/api/popups/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/api/products/[id]/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/products/[id]">> = Specific
