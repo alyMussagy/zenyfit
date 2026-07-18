@@ -41,7 +41,7 @@ export default function HeroSection() {
             <img
               src="https://ldipatlofnuzeglzuexj.supabase.co/storage/v1/object/public/images/logo%20sem%20fundo.webp"
               alt="ZenyFit"
-              className="h-10 sm:h-14 w-auto flex-shrink-0 drop-shadow-lg"
+              className="h-14 sm:h-20 lg:h-24 w-auto flex-shrink-0 drop-shadow-lg"
             />
             <div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight">
