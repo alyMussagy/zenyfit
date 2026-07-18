@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useCartStore } from '@/store/cart-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft, Truck, MapPin, Gift } from 'lucide-react';
+import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft, Truck, MapPin } from 'lucide-react';
 import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-const deliveryZones = ZENYFIT_CONFIG.deliveryZones;
-const { freeDeliveryAbove } = ZENYFIT_CONFIG.delivery;
+const provinces = ZENYFIT_CONFIG.provinces;
 
 function formatMZN(value: number) {
   return value.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' });
@@ -31,37 +30,10 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     customerName: '',
     customerPhone: '',
     province: '',
-    deliveryZone: '',
     address: '',
   });
 
   const subtotal = totalPrice();
-
-  // Get available zones for the selected province
-  const availableZones = useMemo(() => {
-    if (!form.province) return [];
-    const area = deliveryZones.find((d) => d.province === form.province);
-    return area ? [...area.zones] : [];
-  }, [form.province]);
-
-  // Get the raw delivery cost for the selected zone
-  const rawDeliveryCost = useMemo(() => {
-    if (!form.deliveryZone) return 0;
-    for (const area of deliveryZones) {
-      const zone = area.zones.find((z) => z.name === form.deliveryZone);
-      if (zone) return zone.cost;
-    }
-    return 0;
-  }, [form.deliveryZone]);
-
-  // Actual delivery cost: free if above threshold
-  const deliveryCost = subtotal >= freeDeliveryAbove ? 0 : rawDeliveryCost;
-  const isFreeDelivery = subtotal >= freeDeliveryAbove && rawDeliveryCost > 0;
-
-  // How much more to reach free delivery
-  const amountForFreeDelivery = freeDeliveryAbove - subtotal;
-
-  const grandTotal = subtotal + deliveryCost;
 
   if (!open) return null;
 
@@ -71,20 +43,15 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     let msg = `*NOVO PEDIDO ${orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''}*\n\n`;
     msg += `*Cliente:* ${form.customerName}\n`;
     msg += `*Telefone:* ${form.customerPhone}\n`;
-    msg += `*Localização:* ${form.deliveryZone}, ${form.province}\n`;
+    msg += `*Localização:* ${form.province}\n`;
     msg += `*Endereço:* ${form.address}\n\n`;
     msg += `*ITENS:*\n`;
     items.forEach((item, i) => {
       msg += `${i + 1}. ${item.name} x${item.quantity} — ${(item.price * item.quantity).toLocaleString('pt-MZ')} MTn\n`;
     });
-    msg += `\n*Subtotal:* ${subtotal.toLocaleString('pt-MZ')} MTn\n`;
-    if (isFreeDelivery) {
-      msg += `*Entrega (${form.deliveryZone}):* GRÁTIS\n`;
-    } else {
-      msg += `*Entrega (${form.deliveryZone}):* ${deliveryCost.toLocaleString('pt-MZ')} MTn\n`;
-    }
-    msg += `*TOTAL A PAGAR:* ${grandTotal.toLocaleString('pt-MZ')} MTn\n`;
-    msg += `\n*Pagamento:* Na entrega`;
+    msg += `\n*Subtotal dos produtos:* ${subtotal.toLocaleString('pt-MZ')} MTn\n`;
+    msg += `*Entrega:* A confirmar pelo atendente\n`;
+    msg += `\n*Pagamento:* Na entrega (COD)`;
     return encodeURIComponent(msg);
   };
 
@@ -98,19 +65,14 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
 
   const resetAndClose = () => {
     setOrderResult(null);
-    setForm({ customerName: '', customerPhone: '', province: '', deliveryZone: '', address: '' });
+    setForm({ customerName: '', customerPhone: '', province: '', address: '' });
     onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.customerName || !form.customerPhone || !form.province || !form.deliveryZone || !form.address) {
+    if (!form.customerName || !form.customerPhone || !form.province || !form.address) {
       toast.error('Por favor, preencha todos os campos');
-      return;
-    }
-
-    if (deliveryCost === 0 && rawDeliveryCost === 0) {
-      toast.error('Selecione a zona de entrega');
       return;
     }
 
@@ -123,16 +85,16 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
           customerName: form.customerName,
           customerPhone: form.customerPhone,
           province: form.province,
-          city: form.deliveryZone,
+          city: '',
           address: form.address,
-          deliveryFee: deliveryCost,
+          deliveryFee: 0,
           items: items.map((item) => ({
             productId: item.productId,
             productName: item.name,
             quantity: item.quantity,
             price: item.price,
           })),
-          total: grandTotal,
+          total: subtotal,
         }),
       });
 
@@ -182,9 +144,9 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <h2 className="text-xl sm:text-2xl font-bold text-zeny-green-dark mb-2">Pedido Confirmado!</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-zeny-green-dark mb-2">Pedido Registado!</h2>
               <p className="text-sm text-zeny-green-dark/60 mb-6">
-                O seu pedido foi registado com sucesso. Envie pelo WhatsApp para confirmação rápida.
+                Envie os detalhes pelo WhatsApp. O atendente vai confirmar o valor da entrega.
               </p>
 
               {/* Order ID */}
@@ -201,33 +163,23 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               {/* Cost breakdown */}
               <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left space-y-1.5">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Subtotal</span>
+                  <span className="text-gray-500">Subtotal dos produtos</span>
                   <span className="text-gray-700">{formatMZN(subtotal)}</span>
                 </div>
-                {isFreeDelivery ? (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-600 font-medium flex items-center gap-1">
-                      <Gift className="w-3.5 h-3.5" />
-                      Entrega ({form.deliveryZone}) — GRÁTIS
-                    </span>
-                    <span className="text-green-600 line-through">{formatMZN(rawDeliveryCost)}</span>
-                  </div>
-                ) : (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Entrega ({form.deliveryZone})</span>
-                    <span className="text-gray-700">{formatMZN(deliveryCost)}</span>
-                  </div>
-                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Entrega</span>
+                  <span className="text-amber-600 font-medium">A confirmar</span>
+                </div>
                 <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
-                  <span className="text-zeny-green-dark">Total a Pagar</span>
-                  <span className="text-zeny-green">{formatMZN(grandTotal)}</span>
+                  <span className="text-zeny-green-dark">Total Final</span>
+                  <span className="text-zeny-green">A confirmar pelo WhatsApp</span>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <Button onClick={() => window.open(whatsappUrl, '_blank')} className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full py-5 text-base font-semibold gap-2">
                   <MessageCircle className="w-5 h-5" />
-                  Confirmar pelo WhatsApp
+                  Enviar pelo WhatsApp
                 </Button>
                 <Button onClick={resetAndClose} variant="outline" className="w-full rounded-full py-5 text-base font-medium border-zeny-green/20 text-zeny-green-dark hover:bg-zeny-green/5 gap-2">
                   <ArrowLeft className="w-4 h-4" />
@@ -248,7 +200,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50" onClick={resetAndClose}>
       <div className="bg-white rounded-t-2xl sm:rounded-3xl max-w-md w-full max-h-[92vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="sticky top-0 bg-white p-3 sm:p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-2xl sm:rounded-t-3xl z-10">
+        <div className="sticky top-0 bg-white p-3 sm:p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-2xl sm:rounded-3xl z-10">
           <h2 className="text-base sm:text-lg font-bold text-zeny-green-dark">Finalizar Pedido</h2>
           <button onClick={resetAndClose} className="w-10 h-10 rounded-full hover:bg-zeny-green-card flex items-center justify-center -mr-1">
             <X className="w-5 h-5 text-zeny-green-dark/60" />
@@ -267,36 +219,9 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             ))}
           </div>
           <div className="flex justify-between mt-3 pt-3 border-t border-zeny-green/10">
-            <span className="font-bold text-zeny-green-dark">Subtotal</span>
+            <span className="font-bold text-zeny-green-dark">Total dos Produtos</span>
             <span className="font-bold text-zeny-green text-base sm:text-lg">{formatMZN(subtotal)}</span>
           </div>
-
-          {/* Free delivery progress bar */}
-          {amountForFreeDelivery > 0 && (
-            <div className="mt-3 pt-3 border-t border-zeny-green/10">
-              <div className="flex items-center justify-between text-xs mb-1.5">
-                <span className="text-zeny-green-dark/60 flex items-center gap-1">
-                  <Gift className="w-3.5 h-3.5" />
-                  Falta {formatMZN(amountForFreeDelivery)} para entrega grátis
-                </span>
-                <span className="text-zeny-green-dark/40">{formatMZN(freeDeliveryAbove)}</span>
-              </div>
-              <div className="w-full bg-zeny-green/10 rounded-full h-2">
-                <div
-                  className="bg-zeny-green rounded-full h-2 transition-all duration-500"
-                  style={{ width: `${Math.min((subtotal / freeDeliveryAbove) * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
-          {isFreeDelivery && (
-            <div className="mt-3 pt-3 border-t border-zeny-green/10">
-              <div className="flex items-center justify-center gap-1.5 text-sm font-semibold text-green-600 bg-green-50 rounded-lg py-2 px-3">
-                <Gift className="w-4 h-4" />
-                Entrega GRÁTIS neste pedido!
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Form */}
@@ -311,97 +236,37 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             <Input value={form.customerPhone} onChange={(e) => setForm({ ...form, customerPhone: e.target.value })} placeholder="84 XXX XXXX ou 86 XXX XXXX" className="mt-1.5 h-11 rounded-lg border-zeny-green/20" required />
           </div>
 
-          {/* Delivery zone selector */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Truck className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <span className="text-sm font-semibold text-amber-800">Entrega disponível apenas em Maputo e Matola</span>
-            </div>
-            <p className="text-xs text-amber-700/70 ml-6">
-              Entrega grátis em pedidos acima de {formatMZN(freeDeliveryAbove)}
-            </p>
-          </div>
-
           <div>
-            <Label className="text-zeny-green-dark text-sm font-medium">Área de Entrega *</Label>
-            <select value={form.province} onChange={(e) => setForm({ ...form, province: e.target.value, deliveryZone: '' })} className="mt-1.5 w-full h-11 rounded-lg border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30" required>
-              <option value="">Selecione a área</option>
-              {deliveryZones.map((area) => (
-                <option key={area.province} value={area.province}>{area.label}</option>
+            <Label className="text-zeny-green-dark text-sm font-medium">Cidade / Província *</Label>
+            <select value={form.province} onChange={(e) => setForm({ ...form, province: e.target.value })} className="mt-1.5 w-full h-11 rounded-lg border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30" required>
+              <option value="">Selecione a cidade</option>
+              {provinces.map((p) => (
+                <option key={p} value={p}>{p}</option>
               ))}
             </select>
           </div>
 
-          <AnimatePresence mode="wait">
-            {form.province && (
-              <motion.div key={form.province} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}>
-                <div>
-                  <Label className="text-zeny-green-dark text-sm font-medium">Bairro / Zona de Entrega *</Label>
-                  <select value={form.deliveryZone} onChange={(e) => setForm({ ...form, deliveryZone: e.target.value })} className="mt-1.5 w-full h-11 rounded-lg border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30" required>
-                    <option value="">Selecione o bairro/zona</option>
-                    {availableZones.map((zone) => (
-                      <option key={zone.name} value={zone.name}>
-                        {zone.name} — {isFreeDelivery ? 'GRÁTIS' : formatMZN(zone.cost)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Delivery cost display */}
-          <AnimatePresence>
-            {rawDeliveryCost > 0 && (
-              <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="bg-zeny-green/5 border border-zeny-green/20 rounded-xl p-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-zeny-green flex-shrink-0" />
-                  {isFreeDelivery ? (
-                    <span className="text-sm font-medium text-green-600">Entrega: <strong>GRÁTIS</strong> <span className="line-through text-gray-400 text-xs ml-1">{formatMZN(rawDeliveryCost)}</span></span>
-                  ) : (
-                    <span className="text-sm font-medium text-zeny-green-dark">Custo de entrega: <strong className="text-zeny-green">{formatMZN(deliveryCost)}</strong></span>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <div>
-            <Label className="text-zeny-green-dark text-sm font-medium">Endereço Completo *</Label>
-            <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, bairro, número de casa, referência..." className="mt-1.5 w-full min-h-[72px] sm:min-h-[80px] rounded-lg border border-zeny-green/20 bg-white px-3 py-2 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none" required />
+            <Label className="text-zeny-green-dark text-sm font-medium">Bairro e Endereço *</Label>
+            <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Bairro, rua, número de casa, referência..." className="mt-1.5 w-full min-h-[80px] rounded-lg border border-zeny-green/20 bg-white px-3 py-2 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none" required />
           </div>
 
-          {/* Total breakdown */}
-          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Subtotal dos produtos</span>
-              <span className="text-gray-700">{formatMZN(subtotal)}</span>
-            </div>
-            {rawDeliveryCost > 0 && (
-              <div className="flex justify-between text-sm">
-                {isFreeDelivery ? (
-                  <>
-                    <span className="text-green-600 font-medium flex items-center gap-1"><Gift className="w-3.5 h-3.5" /> Entrega ({form.deliveryZone})</span>
-                    <span className="text-green-600 font-medium">GRÁTIS</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-gray-500">Entrega ({form.deliveryZone})</span>
-                    <span className="text-gray-700">{formatMZN(deliveryCost)}</span>
-                  </>
-                )}
+          {/* Delivery info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+            <div className="flex items-start gap-2">
+              <Truck className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-blue-800">Entrega em Maputo e Matola</p>
+                <p className="text-xs text-blue-700/70 mt-0.5">O custo de entrega será confirmado pelo atendente via WhatsApp.</p>
               </div>
-            )}
-            <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
-              <span className="text-zeny-green-dark">Total a Pagar</span>
-              <span className="text-zeny-green">{formatMZN(grandTotal)}</span>
             </div>
           </div>
 
+          {/* COD info */}
           <div className="bg-zeny-green/5 rounded-xl p-3 flex items-start gap-3">
             <CheckCircle className="w-5 h-5 text-zeny-green mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-zeny-green-dark">Pagamento na Entrega</p>
+              <p className="text-sm font-medium text-zeny-green-dark">Pagamento na Entrega (COD)</p>
               <p className="text-xs text-zeny-green-dark/50 mt-0.5">Pague apenas quando receber os seus produtos</p>
             </div>
           </div>
@@ -410,12 +275,12 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             {loading ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" />A processar...</>
             ) : (
-              <><CheckCircle className="w-4 h-4 mr-2" />Confirmar Pedido — {formatMZN(grandTotal)}</>
+              <><MessageCircle className="w-4 h-4 mr-2" />Enviar Pedido pelo WhatsApp</>
             )}
           </Button>
 
           <p className="text-center text-xs text-zeny-green-dark/40">
-            Após confirmar, envie os detalhes pelo WhatsApp para acompanhamento mais rápido
+            Após enviar, o atendente confirma o valor total com a entrega incluída
           </p>
         </form>
       </div>

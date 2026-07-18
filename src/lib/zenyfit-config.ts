@@ -27,72 +27,10 @@ export const ZENYFIT_CONFIG = {
     symbol: 'MTn',
   },
 
-  // Regras de entrega
-  delivery: {
-    // Pedido mínimo para activar entrega (evita viagens para pedidos de 100 MTn)
-    minimumOrder: 500,
-    // Acima deste valor a entrega é grátis
-    freeDeliveryAbove: 3000,
-    // Mensagem quando o pedido é inferior ao mínimo
-    minimumOrderMessage: 'O pedido mínimo para entrega é de 500,00 MTn. Adicione mais produtos ao carrinho.',
-  },
-
-  // Zonas de entrega com custos
-  // Base: Estádio da Machava — preços por distância real
-  // Apenas Maputo Cidade e Matola por enquanto
-  deliveryZones: [
-    {
-      province: 'Maputo Província',
-      label: 'Matola',
-      zones: [
-        // Perto do Estádio da Machava (0-5 km)
-        { name: 'Machava-Sede', cost: 75 },
-        { name: 'Matola Centro', cost: 75 },
-        { name: 'Matola Rio', cost: 100 },
-        { name: 'Infulene', cost: 100 },
-        { name: 'T3 / 25 de Setembro', cost: 100 },
-        // Média distância (5-12 km)
-        { name: 'Costa do Sol (Matola)', cost: 120 },
-        { name: 'Liberdade', cost: 120 },
-        { name: 'Machava 1,5', cost: 120 },
-        { name: 'Vila de Matola', cost: 120 },
-        // Mais longe (12-25 km)
-        { name: 'Boane', cost: 200 },
-        { name: 'Beluluane', cost: 200 },
-        { name: 'Moamba', cost: 250 },
-        { name: 'Namaacha', cost: 300 },
-        { name: 'Outra zona (Matola)', cost: 200 },
-      ] as const,
-    },
-    {
-      province: 'Maputo Cidade',
-      label: 'Maputo Cidade',
-      zones: [
-        // Zona sul de Maputo (perto da ponte, ~10 km de Machava)
-        { name: 'Mafalala / Xipamanine', cost: 100 },
-        { name: 'Chamanculo C / A', cost: 100 },
-        { name: 'Malhangalene', cost: 100 },
-        { name: 'Alto Maé', cost: 120 },
-        { name: 'Coop', cost: 120 },
-        // Centro de Maputo (~12-15 km de Machava)
-        { name: 'Centro / Baixa', cost: 150 },
-        { name: 'Jardim / Livramento', cost: 150 },
-        { name: 'Polana Cimento', cost: 150 },
-        // Zona norte (mais longe, ~15-20 km de Machava)
-        { name: 'Sommerschield', cost: 200 },
-        { name: 'Polana Cimento / Avenida', cost: 200 },
-        { name: 'Costa do Sol', cost: 200 },
-        { name: 'Zimpeto', cost: 250 },
-        { name: 'Marracuene', cost: 300 },
-        { name: 'Outra zona (Cidade)', cost: 250 },
-      ] as const,
-    },
-  ] as const,
-
-  // Províncias de Moçambique (para referência futura)
+  // Cidades de entrega (COD — valor confirmado pelo atendente via WhatsApp)
   provinces: [
     'Maputo Cidade',
-    'Maputo Província',
+    'Maputo Província (Matola)',
   ],
 
   // Categorias de produtos
