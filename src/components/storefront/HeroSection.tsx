@@ -144,51 +144,37 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Right - Visual */}
+          {/* Right - Banner Image */}
           <motion.div
-            className="hidden lg:flex justify-center items-center relative"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
+            className="flex justify-center items-center relative order-first lg:order-last"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
           >
-            <div className="relative">
-              {/* Background circle */}
+            <div className="relative w-full max-w-sm lg:max-w-md xl:max-w-lg">
+              {/* Glow behind image */}
               <motion.div
-                className="w-80 h-80 rounded-full bg-zeny-green/10 flex items-center justify-center"
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-              >
-                <div className="w-64 h-64 rounded-full bg-zeny-green/15 flex items-center justify-center">
-                  <motion.div
-                    className="w-48 h-48 rounded-full bg-gradient-to-br from-zeny-green/20 to-zeny-green-light/30 flex items-center justify-center"
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                  >
-                    <div className="text-center">
-                      <Leaf className="w-16 h-16 text-zeny-green-dark/40 mx-auto mb-2" />
-                      <p className="text-zeny-green-dark/50 text-sm font-medium">Bem-estar Natural</p>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-
+                className="absolute inset-4 bg-zeny-green/15 rounded-3xl blur-2xl"
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <motion.img
+                src="https://ldipatlofnuzeglzuexj.supabase.co/storage/v1/object/public/images/ChatGPT_Image_6_07_2026,_11_53_29.png_2K_202607071119.jpeg"
+                alt="ZenyFit - Produtos de saúde, beleza e bem-estar"
+                className="relative rounded-2xl lg:rounded-3xl shadow-2xl shadow-zeny-green/10 w-full object-cover"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              />
               {/* Cursive text overlay */}
               <motion.div
-                className="absolute -right-8 top-1/3 transform -translate-y-1/2"
+                className="absolute -bottom-3 -right-2 sm:-right-6 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2 shadow-lg"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <p className="text-xl text-zeny-green/60 italic font-light whitespace-nowrap">
-                  &ldquo;Você no seu melhor todos os dias&rdquo;
+                <p className="text-sm sm:text-base text-zeny-green-dark/70 italic font-light whitespace-nowrap">
+                  &ldquo;Você no seu melhor&rdquo;
                 </p>
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1, type: 'spring', stiffness: 300, damping: 10 }}
-                >
-                  <Heart className="w-5 h-5 text-zeny-green/40 mt-2" />
-                </motion.div>
               </motion.div>
             </div>
           </motion.div>
