@@ -28,40 +28,53 @@ export const ZENYFIT_CONFIG = {
   },
 
   // Zonas de entrega com custos
+  // Base: Estádio da Machava — preços por distância real
   // Apenas Maputo Cidade e Matola por enquanto
   deliveryZones: [
-    {
-      province: 'Maputo Cidade',
-      label: 'Maputo Cidade',
-      zones: [
-        { name: 'Centro / Baixa', cost: 100 },
-        { name: 'Polana Cimento / Avenida', cost: 100 },
-        { name: 'Sommerschield', cost: 100 },
-        { name: 'Costa do Sol', cost: 120 },
-        { name: 'Alto Maé', cost: 120 },
-        { name: 'Coop', cost: 120 },
-        { name: 'Mafalala / Xipamanine', cost: 120 },
-        { name: 'Malhangalene', cost: 120 },
-        { name: 'Jardim / Livramento', cost: 150 },
-        { name: 'Laulane', cost: 150 },
-        { name: 'Chamanculo', cost: 150 },
-        { name: 'Zimpeto', cost: 200 },
-        { name: 'Marracuene', cost: 250 },
-        { name: 'Outra zona (Cidade)', cost: 200 },
-      ] as const,
-    },
     {
       province: 'Maputo Província',
       label: 'Matola',
       zones: [
-        { name: 'Matola Centro', cost: 150 },
-        { name: 'Matola Rio', cost: 150 },
-        { name: 'Machava-Sede', cost: 150 },
-        { name: 'Machava 1,5', cost: 200 },
-        { name: 'Boane', cost: 250 },
-        { name: 'Beluluane', cost: 250 },
+        // Perto do Estádio da Machava (0-5 km)
+        { name: 'Machava-Sede', cost: 75 },
+        { name: 'Matola Centro', cost: 75 },
+        { name: 'Matola Rio', cost: 100 },
+        { name: 'Infulene', cost: 100 },
+        { name: 'T3 / 25 de Setembro', cost: 100 },
+        // Média distância (5-12 km)
+        { name: 'Costa do Sol (Matola)', cost: 120 },
+        { name: 'Liberdade', cost: 120 },
+        { name: 'Machava 1,5', cost: 120 },
+        { name: 'Vila de Matola', cost: 120 },
+        // Mais longe (12-25 km)
+        { name: 'Boane', cost: 200 },
+        { name: 'Beluluane', cost: 200 },
+        { name: 'Moamba', cost: 250 },
         { name: 'Namaacha', cost: 300 },
-        { name: 'Outra zona (Matola)', cost: 250 },
+        { name: 'Outra zona (Matola)', cost: 200 },
+      ] as const,
+    },
+    {
+      province: 'Maputo Cidade',
+      label: 'Maputo Cidade',
+      zones: [
+        // Zona sul de Maputo (perto da ponte, ~10 km de Machava)
+        { name: 'Mafalala / Xipamanine', cost: 100 },
+        { name: 'Chamanculo C / A', cost: 100 },
+        { name: 'Malhangalene', cost: 100 },
+        { name: 'Alto Maé', cost: 120 },
+        { name: 'Coop', cost: 120 },
+        // Centro de Maputo (~12-15 km de Machava)
+        { name: 'Centro / Baixa', cost: 150 },
+        { name: 'Jardim / Livramento', cost: 150 },
+        { name: 'Polana Cimento', cost: 150 },
+        // Zona norte (mais longe, ~15-20 km de Machava)
+        { name: 'Sommerschield', cost: 200 },
+        { name: 'Polana Cimento / Avenida', cost: 200 },
+        { name: 'Costa do Sol', cost: 200 },
+        { name: 'Zimpeto', cost: 250 },
+        { name: 'Marracuene', cost: 300 },
+        { name: 'Outra zona (Cidade)', cost: 250 },
       ] as const,
     },
   ] as const,
