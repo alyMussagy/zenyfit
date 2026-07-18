@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft, Truck, MapPin, ShoppingBag, Gift } from 'lucide-react';
+import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft, Truck, MapPin, Gift } from 'lucide-react';
 import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const deliveryZones = ZENYFIT_CONFIG.deliveryZones;
-const { minimumOrder, freeDeliveryAbove, minimumOrderMessage } = ZENYFIT_CONFIG.delivery;
+const { freeDeliveryAbove } = ZENYFIT_CONFIG.delivery;
 
 function formatMZN(value: number) {
   return value.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' });
@@ -57,11 +57,9 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   // Actual delivery cost: free if above threshold
   const deliveryCost = subtotal >= freeDeliveryAbove ? 0 : rawDeliveryCost;
   const isFreeDelivery = subtotal >= freeDeliveryAbove && rawDeliveryCost > 0;
-  const isBelowMinimum = subtotal < minimumOrder;
 
   // How much more to reach free delivery
   const amountForFreeDelivery = freeDeliveryAbove - subtotal;
-  const amountForMinimum = minimumOrder - subtotal;
 
   const grandTotal = subtotal + deliveryCost;
 
@@ -113,11 +111,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
 
     if (deliveryCost === 0 && rawDeliveryCost === 0) {
       toast.error('Selecione a zona de entrega');
-      return;
-    }
-
-    if (isBelowMinimum) {
-      toast.error(minimumOrderMessage);
       return;
     }
 
@@ -249,61 +242,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   }
 
   // ========================
-  // BELOW MINIMUM SCREEN
-  // ========================
-  if (isBelowMinimum) {
-    return (
-      <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50" onClick={resetAndClose}>
-        <div className="bg-white rounded-t-2xl sm:rounded-3xl max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
-          <div className="sticky top-0 bg-white p-3 sm:p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-2xl sm:rounded-t-3xl">
-            <h2 className="text-base sm:text-lg font-bold text-zeny-green-dark">Finalizar Pedido</h2>
-            <button onClick={resetAndClose} className="w-10 h-10 rounded-full hover:bg-zeny-green-card flex items-center justify-center -mr-1">
-              <X className="w-5 h-5 text-zeny-green-dark/60" />
-            </button>
-          </div>
-
-          <div className="p-6 sm:p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
-              <ShoppingBag className="w-8 h-8 text-amber-500" />
-            </div>
-
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Pedido abaixo do mínimo</h3>
-            <p className="text-sm text-gray-500 mb-1">
-              O valor mínimo para entrega é <strong className="text-gray-900">{formatMZN(minimumOrder)}</strong>.
-            </p>
-            <p className="text-sm text-gray-500 mb-6">
-              O seu carrinho tem <strong className="text-gray-900">{formatMZN(subtotal)}</strong>.
-              Adicione mais <strong className="text-amber-600">{formatMZN(amountForMinimum)}</strong> para activar a entrega.
-            </p>
-
-            <div className="bg-amber-50 rounded-xl p-4 mb-6">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-600">No carrinho</span>
-                <span className="text-gray-900 font-medium">{formatMZN(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Falta para mínimo</span>
-                <span className="text-amber-600 font-bold">{formatMZN(amountForMinimum)}</span>
-              </div>
-              <div className="w-full bg-amber-200 rounded-full h-2 mt-3">
-                <div
-                  className="bg-amber-500 rounded-full h-2 transition-all duration-500"
-                  style={{ width: `${Math.min((subtotal / minimumOrder) * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-
-            <Button onClick={resetAndClose} className="w-full bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full py-5 text-base font-semibold gap-2">
-              <ShoppingBag className="w-4 h-4" />
-              Adicionar Mais Produtos
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ========================
   // CHECKOUT FORM
   // ========================
   return (
@@ -380,7 +318,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               <span className="text-sm font-semibold text-amber-800">Entrega disponível apenas em Maputo e Matola</span>
             </div>
             <p className="text-xs text-amber-700/70 ml-6">
-              Pedido mínimo: {formatMZN(minimumOrder)} · Grátis acima de {formatMZN(freeDeliveryAbove)}
+              Entrega grátis em pedidos acima de {formatMZN(freeDeliveryAbove)}
             </p>
           </div>
 
