@@ -52,6 +52,14 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/api/products/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/produto/[id]",
+      "regex": "^/produto/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/produto/(?<nxtPid>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -114,6 +122,12 @@
       "regex": "^/api/products(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/products(?:/)?$"
+    },
+    {
+      "page": "/api/products/related",
+      "regex": "^/api/products/related(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/products/related(?:/)?$"
     },
     {
       "page": "/api/track",

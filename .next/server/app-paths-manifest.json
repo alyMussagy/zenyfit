@@ -10,8 +10,10 @@
   "/api/popups/[id]/route": "app/api/popups/[id]/route.js",
   "/api/popups/route": "app/api/popups/route.js",
   "/api/products/[id]/route": "app/api/products/[id]/route.js",
+  "/api/products/related/route": "app/api/products/related/route.js",
   "/api/products/route": "app/api/products/route.js",
   "/api/route": "app/api/route.js",
   "/api/track/route": "app/api/track/route.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/produto/[id]/page": "app/produto/[id]/page.js"
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Eye, Package, Search, Sparkles, SlidersHorizontal, LayoutGrid, Droplets, Hand, Pill, Flower2, Scissors } from 'lucide-react';
-import { useAppStore } from '@/store/app-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -46,7 +46,6 @@ export default function ProductCatalog() {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const setSelectedProductId = useAppStore((s) => s.setSelectedProductId);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [hideOutOfStock, setHideOutOfStock] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('recentes');
@@ -352,7 +351,7 @@ export default function ProductCatalog() {
                 className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-zeny-green/5 card-hover-lift"
               >
                 {/* Image */}
-                <div className="relative aspect-square overflow-hidden bg-zeny-green-card">
+                <Link href={`/produto/${product.id}`} className="relative aspect-square overflow-hidden bg-zeny-green-card block">
                   <motion.img
                     src={product.image}
                     alt={product.name}
@@ -391,16 +390,15 @@ export default function ProductCatalog() {
                   )}
                   {/* Quick actions - always visible on mobile, hover on desktop */}
                   <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex gap-1.5">
-                    <motion.button
-                      onClick={(e) => { e.stopPropagation(); setSelectedProductId(product.id); }}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 flex items-center justify-center shadow-md active:scale-90 transition-transform"
-                      whileHover={{ scale: 1.15 }}
-                      whileTap={{ scale: 0.9 }}
+                    <Link
+                      href={`/produto/${product.id}`}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 flex items-center justify-center shadow-md hover:scale-110 active:scale-90 transition-transform"
+                      onClick={(e) => e.preventDefault()}
                     >
                       <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zeny-green-dark" />
-                    </motion.button>
+                    </Link>
                     <motion.button
-                      onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
+                      onClick={(e) => { e.preventDefault(); handleAddToCart(product); }}
                       className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zeny-green flex items-center justify-center shadow-md active:scale-90 transition-transform"
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
@@ -408,10 +406,10 @@ export default function ProductCatalog() {
                       <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                     </motion.button>
                   </div>
-                </div>
+                </Link>
 
                 {/* Info */}
-                <div className="p-3 sm:p-4 cursor-pointer" onClick={() => setSelectedProductId(product.id)}>
+                <Link href={`/produto/${product.id}`} className="p-3 sm:p-4 cursor-pointer block">
                   <motion.p
                     className="text-[10px] sm:text-xs text-zeny-green font-medium uppercase tracking-wider mb-0.5 sm:mb-1"
                     initial={{ opacity: 0 }}
@@ -432,7 +430,7 @@ export default function ProductCatalog() {
                     >
                       <Button
                         size="icon"
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => { e.preventDefault(); handleAddToCart(product); }}
                         disabled={!product.inStock}
                         className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zeny-green hover:bg-zeny-green-dark text-white transition-colors duration-200"
                       >
@@ -440,7 +438,7 @@ export default function ProductCatalog() {
                       </Button>
                     </motion.div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </AnimatePresence>
