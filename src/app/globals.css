@@ -249,8 +249,8 @@ html {
 }
 
 /* Prevent horizontal overflow on mobile */
-html, body {
-  overflow-x: hidden;
+body {
+  overflow-x: clip;
 }
 
 /* Better touch scrolling */
