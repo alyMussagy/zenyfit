@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft, Bell } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ProductManager from './ProductManager';
 import OrderManager from './OrderManager';
 import AdminManager from './AdminManager';
 import { useAuthStore } from '@/store/auth-store';
 import { useAppStore } from '@/store/app-store';
 import { authFetch } from '@/lib/auth-fetch';
+import { toast } from 'sonner';
 
 interface DashboardStats {
   totalProducts: number;
@@ -49,6 +50,7 @@ export default function Dashboard() {
   const logout = useAuthStore((s) => s.logout);
   const setView = useAppStore((s) => s.setView);
   const [activeTab, setActiveTab] = useState<DashTab>('overview');
+  const queryClient = useQueryClient();
 
   const handleLogout = () => {
     logout();
@@ -59,6 +61,30 @@ export default function Dashboard() {
     queryKey: ['dashboard'],
     queryFn: () => authFetch('/api/dashboard').then((r) => r.json()),
   });
+
+  // Poll for new orders every 30 seconds
+  const lastPendingCount = useRef(0);
+  useEffect(() => {
+    if (!stats) return;
+    const current = stats.pendingOrders || 0;
+    if (lastPendingCount.current > 0 && current > lastPendingCount.current) {
+      const newCount = current - lastPendingCount.current;
+      toast(`${newCount} novo${newCount > 1 ? 's' : ''} pedido${newCount > 1 ? 's' : ''} recebido${newCount > 1 ? 's' : ''}!`, {
+        description: 'Vá ao separador Pedidos para gerir',
+        icon: <Bell className="w-4 h-4 text-zeny-green" />,
+        duration: 8000,
+      });
+    }
+    lastPendingCount.current = current;
+  }, [stats]);
+
+  // Refetch dashboard every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [queryClient]);
 
   if (isLoading) {
     return (

@@ -18,9 +18,15 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    const updateData: Record<string, unknown> = {};
+    if (body.active !== undefined) updateData.active = body.active;
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.role !== undefined) updateData.role = body.role;
+    if (body.accessCode !== undefined) updateData.accessCode = body.accessCode;
+
     const { data, error } = await supabase
       .from('Admin')
-      .update({ active: body.active })
+      .update(updateData)
       .eq('id', id)
       .select('id, email, name, role, active, createdAt')
       .single();

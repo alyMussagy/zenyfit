@@ -1,13 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, MessageCircle } from 'lucide-react';
 import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 import ScrollReveal, { StaggerContainer, StaggerItem } from './ScrollReveal';
+import OrderTracker from './OrderTracker';
 
 export default function Footer() {
+  const [trackerOpen, setTrackerOpen] = useState(false);
+
   return (
-    <footer id="contacto" className="bg-zeny-green-dark text-white">
+    <>
+      <OrderTracker open={trackerOpen} onClose={() => setTrackerOpen(false)} />
+      <footer id="contacto" className="bg-zeny-green-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
         <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10" staggerDelay={0.12}>
           {/* Brand & Categories - merged on mobile */}
@@ -48,11 +54,13 @@ export default function Footer() {
                   { label: 'Início', href: '#hero' },
                   { label: 'Produtos', href: '#produtos' },
                   { label: 'Sobre Nós', href: '#sobre' },
+                  { label: 'Rastrear Pedido', href: '#track', action: () => setTrackerOpen(true) },
                   { label: 'Contacto', href: '#contacto' },
                 ].map((link, i) => (
-                  <li key={link.href}>
+                  <li key={link.label}>
                     <motion.a
                       href={link.href}
+                      onClick={(e) => { if (link.action) { e.preventDefault(); link.action(); } }}
                       className="text-sm text-white/60 hover:text-white transition-colors duration-200 inline-block"
                       whileHover={{ x: 4 }}
                       initial={{ opacity: 0, x: -10 }}
@@ -137,5 +145,6 @@ export default function Footer() {
         </div>
       </ScrollReveal>
     </footer>
+    </>
   );
 }

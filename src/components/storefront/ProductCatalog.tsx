@@ -108,6 +108,15 @@ export default function ProductCatalog() {
   }, [products, activeCategory, search, showFeaturedOnly, hideOutOfStock, sortBy]);
 
   const handleAddToCart = (product: Product) => {
+    if (!product.inStock) {
+      toast.error('Este produto está esgotado');
+      return;
+    }
+    const current = useCartStore.getState().items.find((i) => i.productId === product.id);
+    if (current && current.quantity >= 10) {
+      toast.warning('Quantidade máxima atingida (10 unidades)');
+      return;
+    }
     addItem({
       productId: product.id,
       name: product.name,

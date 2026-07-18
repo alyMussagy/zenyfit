@@ -22,6 +22,7 @@ interface CartStore {
 }
 
 const CART_KEY = 'zenyfit-cart';
+const MAX_QTY_PER_ITEM = 10;
 
 function saveToStorage(items: CartItem[]) {
   if (typeof window !== 'undefined') {
@@ -60,11 +61,15 @@ export const useCartStore = create<CartStore>((set, get) => ({
   addItem: (item) => {
     set((state) => {
       const existing = state.items.find((i) => i.productId === item.productId);
+      // Max quantity check
+      if (existing && existing.quantity >= MAX_QTY_PER_ITEM) {
+        return state;
+      }
       let newItems: CartItem[];
       if (existing) {
         newItems = state.items.map((i) =>
           i.productId === item.productId
-            ? { ...i, quantity: i.quantity + 1 }
+            ? { ...i, quantity: Math.min(i.quantity + 1, MAX_QTY_PER_ITEM) }
             : i
         );
       } else {
@@ -88,9 +93,10 @@ export const useCartStore = create<CartStore>((set, get) => ({
       get().removeItem(id);
       return;
     }
+    const clampedQty = Math.min(quantity, MAX_QTY_PER_ITEM);
     set((state) => {
       const newItems = state.items.map((i) =>
-        i.id === id ? { ...i, quantity } : i
+        i.id === id ? { ...i, quantity: clampedQty } : i
       );
       saveToStorage(newItems);
       return { items: newItems };
