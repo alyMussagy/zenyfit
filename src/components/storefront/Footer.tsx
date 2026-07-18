@@ -19,15 +19,12 @@ export default function Footer() {
           {/* Brand & Categories - merged on mobile */}
           <StaggerItem variant="fadeUp">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <motion.div
-                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center"
-                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.15)' }}
-                >
-                  <svg viewBox="0 0 60 60" className="w-6 h-6" fill="none">
-                    <text x="30" y="38" textAnchor="middle" fill="white" fontSize="28" fontWeight="bold" fontFamily="sans-serif">Z</text>
-                  </svg>
-                </motion.div>
+              <div className="flex items-center gap-2.5 mb-4">
+                <img
+                  src="https://ldipatlofnuzeglzuexj.supabase.co/storage/v1/object/public/images/logo%20sem%20fundo.webp"
+                  alt="ZenyFit"
+                  className="h-8 w-auto brightness-0 invert"
+                />
                 <span className="text-xl font-bold tracking-tight">Zeny<span className="text-zeny-green-light">Fit</span></span>
               </div>
               <p className="text-sm text-white/60 leading-relaxed">

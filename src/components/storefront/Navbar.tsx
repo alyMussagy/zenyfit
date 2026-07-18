@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, LayoutDashboard, Menu, X, Leaf } from 'lucide-react';
+import { ShoppingCart, LayoutDashboard, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -59,10 +59,11 @@ export default function Navbar() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <div className="w-9 h-9 rounded-full bg-zeny-green/10 flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-zeny-green-dark" />
-            </div>
-            <span className="text-xl font-bold text-zeny-green-dark tracking-tight">Zeny<span className="text-zeny-green">Fit</span></span>
+            <img
+              src="https://ldipatlofnuzeglzuexj.supabase.co/storage/v1/object/public/images/logo%20sem%20fundo.webp"
+              alt="ZenyFit"
+              className="h-9 w-auto"
+            />
           </motion.div>
 
           {/* Desktop Nav */}

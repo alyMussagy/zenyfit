@@ -38,16 +38,11 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
           >
-            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20 flex-shrink-0">
-              <svg viewBox="0 0 60 60" className="w-7 h-7 sm:w-9 sm:h-9" fill="none">
-                <circle cx="30" cy="30" r="28" stroke="white" strokeWidth="2" />
-                <text x="30" y="38" textAnchor="middle" fill="white" fontSize="26" fontWeight="bold" fontFamily="sans-serif">Z</text>
-                <path d="M40 18 C48 24, 50 32, 44 42 C38 34, 34 26, 40 18Z" fill="#6FD63A" />
-                <circle cx="16" cy="20" r="2" fill="#6FD63A" />
-                <circle cx="12" cy="26" r="1.5" fill="white" />
-                <circle cx="18" cy="28" r="1" fill="#6FD63A" />
-              </svg>
-            </div>
+            <img
+              src="https://ldipatlofnuzeglzuexj.supabase.co/storage/v1/object/public/images/logo%20sem%20fundo.webp"
+              alt="ZenyFit"
+              className="h-10 sm:h-14 w-auto flex-shrink-0 drop-shadow-lg"
+            />
             <div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight">
                 Zeny<span className="text-zeny-green-light">Fit</span>

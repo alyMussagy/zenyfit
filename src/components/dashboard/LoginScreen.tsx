@@ -53,12 +53,11 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
       <div className="relative w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-zeny-green-card mb-4">
-            <Leaf className="w-8 h-8 text-zeny-green" />
-          </div>
-          <h1 className="text-2xl font-bold text-zeny-green-dark">
-            Zeny<span className="text-zeny-green">Fit</span>
-          </h1>
+          <img
+            src="https://ldipatlofnuzeglzuexj.supabase.co/storage/v1/object/public/images/logo%20sem%20fundo.webp"
+            alt="ZenyFit"
+            className="h-16 w-auto mx-auto mb-4"
+          />
           <p className="text-sm text-zeny-green-dark/50 mt-1">Painel de Controlo</p>
         </div>
 
