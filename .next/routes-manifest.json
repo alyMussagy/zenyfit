@@ -102,10 +102,10 @@
       "namedRegex": "^/api/products(?:/)?$"
     },
     {
-      "page": "/api/upload",
-      "regex": "^/api/upload(?:/)?$",
+      "page": "/api/track",
+      "regex": "^/api/track(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/api/upload(?:/)?$"
+      "namedRegex": "^/api/track(?:/)?$"
     }
   ],
   "dataRoutes": [],
