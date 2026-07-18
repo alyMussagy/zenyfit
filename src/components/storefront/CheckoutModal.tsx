@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCartStore } from '@/store/cart-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft } from 'lucide-react';
+import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft, Truck, MapPin } from 'lucide-react';
 import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const provinces = ZENYFIT_CONFIG.provinces;
+const deliveryZones = ZENYFIT_CONFIG.deliveryZones;
+
+function formatMZN(value: number) {
+  return value.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' });
+}
 
 interface CheckoutModalProps {
   open: boolean;
@@ -26,9 +30,29 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     customerName: '',
     customerPhone: '',
     province: '',
-    city: '',
+    deliveryZone: '',
     address: '',
   });
+
+  // Get available zones for the selected province
+  const availableZones = useMemo(() => {
+    if (!form.province) return [];
+    const area = deliveryZones.find((d) => d.province === form.province);
+    return area ? [...area.zones] : [];
+  }, [form.province]);
+
+  // Get the delivery cost for the selected zone
+  const deliveryCost = useMemo(() => {
+    if (!form.deliveryZone) return 0;
+    for (const area of deliveryZones) {
+      const zone = area.zones.find((z) => z.name === form.deliveryZone);
+      if (zone) return zone.cost;
+    }
+    return 0;
+  }, [form.deliveryZone]);
+
+  const subtotal = totalPrice();
+  const grandTotal = subtotal + deliveryCost;
 
   if (!open) return null;
 
@@ -38,13 +62,15 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     let msg = `*NOVO PEDIDO ${orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''}*\n\n`;
     msg += `*Cliente:* ${form.customerName}\n`;
     msg += `*Telefone:* ${form.customerPhone}\n`;
-    msg += `*Localização:* ${form.city}, ${form.province}\n`;
+    msg += `*Localização:* ${form.deliveryZone}, ${form.province}\n`;
     msg += `*Endereço:* ${form.address}\n\n`;
     msg += `*ITENS:*\n`;
     items.forEach((item, i) => {
       msg += `${i + 1}. ${item.name} x${item.quantity} — ${(item.price * item.quantity).toLocaleString('pt-MZ')} MTn\n`;
     });
-    msg += `\n*TOTAL: ${totalPrice().toLocaleString('pt-MZ')} MTn*\n`;
+    msg += `\n*Subtotal:* ${subtotal.toLocaleString('pt-MZ')} MTn\n`;
+    msg += `*Entrega (${form.deliveryZone}):* ${deliveryCost.toLocaleString('pt-MZ')} MTn\n`;
+    msg += `*TOTAL A PAGAR:* ${grandTotal.toLocaleString('pt-MZ')} MTn\n`;
     msg += `\n*Pagamento:* Na entrega`;
     return encodeURIComponent(msg);
   };
@@ -59,14 +85,19 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
 
   const resetAndClose = () => {
     setOrderResult(null);
-    setForm({ customerName: '', customerPhone: '', province: '', city: '', address: '' });
+    setForm({ customerName: '', customerPhone: '', province: '', deliveryZone: '', address: '' });
     onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.customerName || !form.customerPhone || !form.province || !form.city || !form.address) {
+    if (!form.customerName || !form.customerPhone || !form.province || !form.deliveryZone || !form.address) {
       toast.error('Por favor, preencha todos os campos');
+      return;
+    }
+
+    if (deliveryCost === 0) {
+      toast.error('Selecione a zona de entrega');
       return;
     }
 
@@ -76,14 +107,19 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...form,
+          customerName: form.customerName,
+          customerPhone: form.customerPhone,
+          province: form.province,
+          city: form.deliveryZone,
+          address: form.address,
+          deliveryFee: deliveryCost,
           items: items.map((item) => ({
             productId: item.productId,
             productName: item.name,
             quantity: item.quantity,
             price: item.price,
           })),
-          total: totalPrice(),
+          total: grandTotal,
         }),
       });
 
@@ -138,11 +174,11 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             >
               <h2 className="text-xl sm:text-2xl font-bold text-zeny-green-dark mb-2">Pedido Confirmado!</h2>
               <p className="text-sm text-zeny-green-dark/60 mb-6">
-                O seu pedido foi registado com sucesso. Acompanhe o estado pelo WhatsApp.
+                O seu pedido foi registado com sucesso. Envie pelo WhatsApp para confirmação rápida.
               </p>
 
               {/* Order ID card */}
-              <div className="bg-zeny-green-card/50 rounded-xl p-4 mb-6">
+              <div className="bg-zeny-green-card/50 rounded-xl p-4 mb-4">
                 <p className="text-xs text-zeny-green-dark/50 uppercase tracking-wider mb-1">Número do Pedido</p>
                 <div className="flex items-center justify-center gap-2">
                   <span className="text-2xl font-mono font-bold text-zeny-green-dark tracking-wider">
@@ -156,9 +192,22 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                     <Copy className={`w-4 h-4 ${copied ? 'text-zeny-green' : 'text-zeny-green-dark/40'}`} />
                   </button>
                 </div>
-                <p className="text-xs text-zeny-green-dark/40 mt-1">
-                  Total: {orderResult.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
-                </p>
+              </div>
+
+              {/* Cost breakdown */}
+              <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left space-y-1.5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Subtotal</span>
+                  <span className="text-gray-700">{formatMZN(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Entrega ({form.deliveryZone})</span>
+                  <span className="text-gray-700">{formatMZN(deliveryCost)}</span>
+                </div>
+                <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
+                  <span className="text-zeny-green-dark">Total a Pagar</span>
+                  <span className="text-zeny-green">{formatMZN(grandTotal)}</span>
+                </div>
               </div>
 
               {/* Actions */}
@@ -206,14 +255,14 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               <div key={item.id} className="flex justify-between text-sm">
                 <span className="text-zeny-green-dark/70 truncate mr-2">{item.name} x{item.quantity}</span>
                 <span className="text-zeny-green-dark font-medium whitespace-nowrap">
-                  {(item.price * item.quantity).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+                  {formatMZN(item.price * item.quantity)}
                 </span>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-3 pt-3 border-t border-zeny-green/10">
-            <span className="font-bold text-zeny-green-dark">Total</span>
-            <span className="font-bold text-zeny-green text-base sm:text-lg">{totalPrice().toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}</span>
+            <span className="font-bold text-zeny-green-dark">Subtotal</span>
+            <span className="font-bold text-zeny-green text-base sm:text-lg">{formatMZN(subtotal)}</span>
           </div>
         </div>
 
@@ -241,41 +290,104 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             />
           </div>
 
+          {/* Delivery zone selector */}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Truck className="w-4 h-4 text-amber-600 flex-shrink-0" />
+              <span className="text-sm font-semibold text-amber-800">Entrega disponível apenas em Maputo e Matola</span>
+            </div>
+          </div>
+
           <div>
-            <Label className="text-zeny-green-dark text-sm font-medium">Província *</Label>
+            <Label className="text-zeny-green-dark text-sm font-medium">Área de Entrega *</Label>
             <select
               value={form.province}
-              onChange={(e) => setForm({ ...form, province: e.target.value })}
+              onChange={(e) => setForm({ ...form, province: e.target.value, deliveryZone: '' })}
               className="mt-1.5 w-full h-11 rounded-lg border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
               required
             >
-              <option value="">Selecione a província</option>
-              {provinces.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              <option value="">Selecione a área</option>
+              {deliveryZones.map((area) => (
+                <option key={area.province} value={area.province}>
+                  {area.label}
+                </option>
               ))}
             </select>
           </div>
 
-          <div>
-            <Label className="text-zeny-green-dark text-sm font-medium">Cidade / Distrito *</Label>
-            <Input
-              value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              placeholder="Ex: Matola, Beira, Nampula..."
-              className="mt-1.5 h-11 rounded-lg border-zeny-green/20"
-              required
-            />
-          </div>
+          <AnimatePresence mode="wait">
+            {form.province && (
+              <motion.div
+                key={form.province}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div>
+                  <Label className="text-zeny-green-dark text-sm font-medium">Bairro / Zona de Entrega *</Label>
+                  <select
+                    value={form.deliveryZone}
+                    onChange={(e) => setForm({ ...form, deliveryZone: e.target.value })}
+                    className="mt-1.5 w-full h-11 rounded-lg border border-zeny-green/20 bg-white px-3 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
+                    required
+                  >
+                    <option value="">Selecione o bairro/zona</option>
+                    {availableZones.map((zone) => (
+                      <option key={zone.name} value={zone.name}>
+                        {zone.name} — {formatMZN(zone.cost)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Delivery cost display */}
+          <AnimatePresence>
+            {deliveryCost > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="bg-zeny-green/5 border border-zeny-green/20 rounded-xl p-3"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-zeny-green flex-shrink-0" />
+                  <span className="text-sm font-medium text-zeny-green-dark">Custo de entrega: <strong className="text-zeny-green">{formatMZN(deliveryCost)}</strong></span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div>
             <Label className="text-zeny-green-dark text-sm font-medium">Endereço Completo *</Label>
             <textarea
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
-              placeholder="Rua, bairro, número de casa..."
+              placeholder="Rua, bairro, número de casa, referência..."
               className="mt-1.5 w-full min-h-[72px] sm:min-h-[80px] rounded-lg border border-zeny-green/20 bg-white px-3 py-2 text-sm text-zeny-green-dark focus:outline-none focus:ring-2 focus:ring-zeny-green/30 resize-none"
               required
             />
+          </div>
+
+          {/* Total breakdown */}
+          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Subtotal dos produtos</span>
+              <span className="text-gray-700">{formatMZN(subtotal)}</span>
+            </div>
+            {deliveryCost > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Entrega ({form.deliveryZone})</span>
+                <span className="text-gray-700">{formatMZN(deliveryCost)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-200">
+              <span className="text-zeny-green-dark">Total a Pagar</span>
+              <span className="text-zeny-green">{formatMZN(grandTotal)}</span>
+            </div>
           </div>
 
           <div className="bg-zeny-green/5 rounded-xl p-3 flex items-start gap-3">
@@ -299,13 +411,13 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             ) : (
               <>
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Confirmar Pedido
+                Confirmar Pedido — {formatMZN(grandTotal)}
               </>
             )}
           </Button>
 
           <p className="text-center text-xs text-zeny-green-dark/40">
-            Após confirmar, pode enviar os detalhes pelo WhatsApp para acompanhamento mais rápido
+            Após confirmar, envie os detalhes pelo WhatsApp para acompanhamento mais rápido
           </p>
         </form>
       </div>

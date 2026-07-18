@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { customerName, customerPhone, province, city, address, items, total } = body;
+    const { customerName, customerPhone, province, city, address, deliveryFee, items, total } = body;
 
     // Create the order
     const { data: order, error: orderError } = await supabase
@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
         province,
         city,
         address,
+        deliveryFee: deliveryFee ? parseFloat(deliveryFee) : 0,
         total: parseFloat(total),
         status: 'pendente',
       })

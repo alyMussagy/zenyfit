@@ -20,6 +20,7 @@ interface Order {
   province: string;
   city: string;
   address: string;
+  deliveryFee: number;
   status: string;
   total: number;
   createdAt: string;
@@ -104,7 +105,8 @@ export default function OrderManager() {
 
   const openWhatsApp = (order: Order) => {
     const items = order.items.map((i) => `  - ${i.productName} x${i.quantity} (${(i.price * i.quantity).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })})`).join('\n');
-    const message = `Olá ${order.customerName}! 👋\n\nAqui é da ZenyFit. O seu pedido *#${order.id.slice(0, 8)}* encontra-se com status: *${order.status.toUpperCase()}*\n\n*Itens:*\n${items}\n\n*Total:* ${order.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}\n\n*Entrega:* ${order.address}, ${order.city}, ${order.province}\n\nObrigado pela sua preferência! 💚`;
+    const subtotal = order.total - (order.deliveryFee || 0);
+    const message = `Olá ${order.customerName}! 👋\n\nAqui é da ZenyFit. O seu pedido *#${order.id.slice(0, 8)}* encontra-se com status: *${order.status.toUpperCase()}*\n\n*Itens:*\n${items}\n\n*Subtotal:* ${subtotal.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}\n*Entrega (${order.city}):* ${(order.deliveryFee || 0).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}\n*Total:* ${order.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}\n\n*Entrega:* ${order.address}, ${order.city}, ${order.province}\n\nObrigado pela sua preferência! 💚`;
     window.open(`https://wa.me/${order.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -180,9 +182,16 @@ export default function OrderManager() {
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-lg font-bold text-gray-900">
-                        {order.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
-                      </span>
+                      <div className="text-right">
+                        {order.deliveryFee > 0 && (
+                          <p className="text-xs text-gray-400">
+                            Entrega: {order.deliveryFee.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+                          </p>
+                        )}
+                        <span className="text-lg font-bold text-gray-900">
+                          {order.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1.5 sm:gap-2">
                         {/* WhatsApp button */}
                         <Button
@@ -249,6 +258,12 @@ export default function OrderManager() {
                       </div>
                       <div className="mt-3 text-xs text-gray-400">
                         <span className="font-medium text-gray-600">Endereço:</span> {order.address}, {order.city}, {order.province}
+                        {order.deliveryFee > 0 && (
+                          <span className="ml-3">
+                            <span className="font-medium text-gray-600">Entrega:</span>{' '}
+                            {order.deliveryFee.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )}

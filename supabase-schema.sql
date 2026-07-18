@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS "Order" (
   "province" TEXT NOT NULL,
   "city" TEXT NOT NULL,
   "address" TEXT NOT NULL,
+  "deliveryFee" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "status" TEXT NOT NULL DEFAULT 'pendente',
   "total" DOUBLE PRECISION NOT NULL,
   "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
