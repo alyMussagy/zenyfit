@@ -38,6 +38,11 @@ export async function PUT(
     if (body.category !== undefined) updateData.category = body.category;
     if (body.inStock !== undefined) updateData.inStock = body.inStock;
     if (body.featured !== undefined) updateData.featured = body.featured;
+    if (body.ingredients !== undefined) updateData.ingredients = Array.isArray(body.ingredients) ? body.ingredients : [];
+    if (body.howToUse !== undefined) updateData.howToUse = body.howToUse?.trim() || '';
+    if (body.benefits !== undefined) updateData.benefits = Array.isArray(body.benefits) ? body.benefits : [];
+    if (body.weight !== undefined) updateData.weight = body.weight?.trim() || '';
+    if (body.additionalImages !== undefined) updateData.additionalImages = Array.isArray(body.additionalImages) ? body.additionalImages : [];
 
     const { data, error } = await supabase.from('Product').update(updateData).eq('id', id).select().single();
     if (error) throw error;

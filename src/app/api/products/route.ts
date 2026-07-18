@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (authError) return unauthorizedResponse(authError);
 
     const body = await request.json();
-    const { name, description, price, image, category, inStock, featured } = body;
+    const { name, description, price, image, category, inStock, featured, ingredients, howToUse, benefits, weight, additionalImages } = body;
 
     const { data, error } = await supabase.from('Product').insert({
       name,
@@ -46,6 +46,11 @@ export async function POST(request: NextRequest) {
       category,
       inStock: inStock ?? true,
       featured: featured ?? false,
+      ingredients: Array.isArray(ingredients) ? ingredients : [],
+      howToUse: howToUse?.trim() || '',
+      benefits: Array.isArray(benefits) ? benefits : [],
+      weight: weight?.trim() || '',
+      additionalImages: Array.isArray(additionalImages) ? additionalImages : [],
     }).select().single();
 
     if (error) throw error;

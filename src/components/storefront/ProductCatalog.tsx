@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Star, Eye, Package, Search, Sparkles, SlidersHorizontal, LayoutGrid, Droplets, Hand, Pill, Flower2, Scissors } from 'lucide-react';
+import { ShoppingCart, Eye, Package, Search, Sparkles, SlidersHorizontal, LayoutGrid, Droplets, Hand, Pill, Flower2, Scissors } from 'lucide-react';
+import { useAppStore } from '@/store/app-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -45,7 +46,7 @@ export default function ProductCatalog() {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const setSelectedProductId = useAppStore((s) => s.setSelectedProductId);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [hideOutOfStock, setHideOutOfStock] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('recentes');
@@ -389,20 +390,28 @@ export default function ProductCatalog() {
                     </motion.div>
                   )}
                   {/* Quick actions - always visible on mobile, hover on desktop */}
-                  <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
+                  <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex gap-1.5">
                     <motion.button
-                      onClick={() => setSelectedProduct(product)}
+                      onClick={(e) => { e.stopPropagation(); setSelectedProductId(product.id); }}
                       className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 flex items-center justify-center shadow-md active:scale-90 transition-transform"
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
                     >
                       <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zeny-green-dark" />
                     </motion.button>
+                    <motion.button
+                      onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zeny-green flex items-center justify-center shadow-md active:scale-90 transition-transform"
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                    </motion.button>
                   </div>
                 </div>
 
                 {/* Info */}
-                <div className="p-3 sm:p-4">
+                <div className="p-3 sm:p-4 cursor-pointer" onClick={() => setSelectedProductId(product.id)}>
                   <motion.p
                     className="text-[10px] sm:text-xs text-zeny-green font-medium uppercase tracking-wider mb-0.5 sm:mb-1"
                     initial={{ opacity: 0 }}
@@ -437,99 +446,6 @@ export default function ProductCatalog() {
           </AnimatePresence>
         </motion.div>
       )}
-
-      {/* Product Detail Modal */}
-      <AnimatePresence>
-        {selectedProduct && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setSelectedProduct(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 80 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 80 }}
-              transition={{ duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
-              className="bg-white rounded-t-2xl sm:rounded-3xl max-w-lg w-full max-h-[85vh] sm:max-h-none overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="aspect-video bg-zeny-green-card relative">
-                <motion.img
-                  src={selectedProduct.image}
-                  alt={selectedProduct.name}
-                  className="w-full h-full object-cover"
-                  initial={{ scale: 1.1 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    (target.parentElement as HTMLElement).innerHTML = '<div class="flex items-center justify-center w-full h-full bg-zeny-green-card"><svg class="w-16 h-16 text-zeny-green/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
-                  }}
-                />
-                <motion.button
-                  onClick={() => setSelectedProduct(null)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-white text-zeny-green-dark/60"
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  ✕
-                </motion.button>
-              </div>
-              <div className="p-4 sm:p-6">
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                >
-                  <Badge className="mb-3 bg-zeny-green/10 text-zeny-green hover:bg-zeny-green/20 text-xs">{selectedProduct.category}</Badge>
-                  <h3 className="text-lg sm:text-xl font-bold text-zeny-green-dark mb-2">{selectedProduct.name}</h3>
-                  <p className="text-sm text-zeny-green-dark/60 mb-4 leading-relaxed">{selectedProduct.description}</p>
-                  <div className="flex items-center gap-2 mb-6">
-                    {[1,2,3,4,5].map((s, i) => (
-                      <motion.svg
-                        key={s}
-                        className="w-4 h-4 fill-amber-400 text-amber-400"
-                        viewBox="0 0 20 20"
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.2 + i * 0.06, type: 'spring', stiffness: 400, damping: 15 }}
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </motion.svg>
-                    ))}
-                    <span className="text-xs text-zeny-green-dark/40 ml-1">(4.8)</span>
-                  </div>
-                </motion.div>
-                <motion.div
-                  className="flex items-center justify-between"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <span className="text-xl sm:text-2xl font-bold text-zeny-green-dark">
-                    {selectedProduct.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
-                  </span>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      onClick={() => { handleAddToCart(selectedProduct); setSelectedProduct(null); }}
-                      disabled={!selectedProduct.inStock}
-                      className="bg-zeny-green hover:bg-zeny-green-dark text-white rounded-full px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base transition-colors duration-200"
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Adicionar ao Carrinho
-                    </Button>
-                  </motion.div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
