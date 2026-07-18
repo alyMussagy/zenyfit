@@ -116,17 +116,19 @@ export default function Navbar() {
               </Sheet>
             )}
 
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Button
-                variant={view === 'dashboard' ? 'default' : 'ghost'}
-                size="icon"
-                onClick={() => setView(view === 'dashboard' ? 'store' : 'dashboard')}
-                className="text-zeny-green-dark hover:bg-zeny-green/10"
-                title={view === 'dashboard' ? 'Voltar à loja' : 'Painel de Controlo'}
-              >
-                <LayoutDashboard className="w-5 h-5" />
-              </Button>
-            </motion.div>
+            {view === 'dashboard' && (
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button
+                  variant="default"
+                  size="icon"
+                  onClick={() => setView('store')}
+                  className="text-zeny-green-dark hover:bg-zeny-green/10"
+                  title="Voltar à loja"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                </Button>
+              </motion.div>
+            )}
 
             {/* Mobile Menu */}
             {view === 'store' && (
