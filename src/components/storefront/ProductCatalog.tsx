@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Star, Eye, Package, Search, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { ShoppingCart, Star, Eye, Package, Search, Sparkles, SlidersHorizontal, LayoutGrid, Droplets, Hand, Pill, Flower2, Scissors } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,14 @@ interface Product {
   featured: boolean;
 }
 
-const categories = ['Todos', 'Skincare', 'Corpo', 'Suplementos', 'Aromaterapia', 'Cabelo'];
+const categoryConfig: { name: string; icon: React.ElementType }[] = [
+  { name: 'Todos', icon: LayoutGrid },
+  { name: 'Skincare', icon: Droplets },
+  { name: 'Corpo', icon: Hand },
+  { name: 'Suplementos', icon: Pill },
+  { name: 'Aromaterapia', icon: Flower2 },
+  { name: 'Cabelo', icon: Scissors },
+];
 
 type SortOption = 'recentes' | 'preco-asc' | 'preco-desc' | 'nome-asc';
 
@@ -176,31 +183,38 @@ export default function ProductCatalog() {
             </motion.button>
           </div>
 
-          {/* Category pills */}
-          <div className="flex gap-2 sm:flex-wrap overflow-x-auto sm:overflow-visible scroll-x-no-scrollbar pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
-            {categories.map((cat, index) => (
-              <motion.button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
-                  activeCategory === cat
-                    ? 'bg-zeny-green text-white shadow-md shadow-zeny-green/20'
-                    : 'bg-white text-zeny-green-dark/70 hover:bg-zeny-green/10 border border-zeny-green/10'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 + index * 0.04 }}
-              >
-                {cat}
-                {categoryCounts[cat] !== undefined && (
-                  <span className={`ml-1.5 text-xs ${activeCategory === cat ? 'text-white/70' : 'text-zeny-green-dark/30'}`}>
-                    {categoryCounts[cat]}
+          {/* Category bar with icons */}
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto sm:overflow-visible scroll-x-no-scrollbar pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+            {categoryConfig.map((cat, index) => {
+              const Icon = cat.icon;
+              const isActive = activeCategory === cat.name;
+              return (
+                <motion.button
+                  key={cat.name}
+                  onClick={() => setActiveCategory(cat.name)}
+                  className={`flex flex-col items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl transition-all duration-200 whitespace-nowrap min-w-[64px] sm:min-w-0 ${
+                    isActive
+                      ? 'bg-zeny-green text-white shadow-lg shadow-zeny-green/25'
+                      : 'bg-white text-zeny-green-dark/60 hover:bg-zeny-green/5 border border-gray-100 hover:border-zeny-green/20'
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 + index * 0.05 }}
+                >
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${isActive ? 'text-white' : 'text-zeny-green-dark/50'}`} strokeWidth={1.5} />
+                  <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wide">
+                    {cat.name}
                   </span>
-                )}
-              </motion.button>
-            ))}
+                  {(categoryCounts[cat.name] ?? 0) > 0 && cat.name !== 'Todos' && (
+                    <span className={`text-[9px] sm:text-[10px] font-medium ${isActive ? 'text-white/60' : 'text-zeny-green-dark/30'}`}>
+                      {categoryCounts[cat.name]}
+                    </span>
+                  )}
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Extended filters panel */}
