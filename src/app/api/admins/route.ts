@@ -1,8 +1,17 @@
 import { supabase } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { validateAdmin, unauthorizedResponse } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { admin, error: authError } = await validateAdmin(request);
+    if (authError) return unauthorizedResponse(authError);
+
+    // Only owner can list admins
+    if (admin.role !== 'owner') {
+      return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
+    }
+
     const { data, error } = await supabase
       .from('Admin')
       .select('id, email, name, role, active, createdAt')
@@ -17,6 +26,14 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const { admin, error: authError } = await validateAdmin(request);
+    if (authError) return unauthorizedResponse(authError);
+
+    // Only owner can create admins
+    if (admin.role !== 'owner') {
+      return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
+    }
+
     const { email, name, accessCode, role } = await request.json();
 
     if (!email || !accessCode) {

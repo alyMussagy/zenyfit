@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth-store';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface Admin {
   id: string;
@@ -27,7 +28,7 @@ export default function AdminManager() {
 
   const { data: admins, isLoading } = useQuery<Admin[]>({
     queryKey: ['admins'],
-    queryFn: () => fetch('/api/admins').then((r) => r.json()),
+    queryFn: () => authFetch('/api/admins').then((r) => r.json()),
   });
 
   const isOwner = currentAdmin?.role === 'owner';
@@ -41,9 +42,8 @@ export default function AdminManager() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/admins', {
+      const res = await authFetch('/api/admins', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
 
@@ -65,9 +65,8 @@ export default function AdminManager() {
 
   const handleToggle = async (admin: Admin) => {
     try {
-      await fetch(`/api/admins/${admin.id}`, {
+      await authFetch(`/api/admins/${admin.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: !admin.active }),
       });
       toast.success(admin.active ? 'Administrador desactivado' : 'Administrador activado');
@@ -80,7 +79,7 @@ export default function AdminManager() {
   const handleDelete = async (id: string) => {
     if (!confirm('Eliminar este administrador?')) return;
     try {
-      await fetch(`/api/admins/${id}`, { method: 'DELETE' });
+      await authFetch(`/api/admins/${id}`, { method: 'DELETE' });
       toast.success('Administrador eliminado');
       queryClient.invalidateQueries({ queryKey: ['admins'] });
     } catch {

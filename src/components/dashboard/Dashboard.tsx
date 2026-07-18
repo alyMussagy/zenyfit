@@ -9,6 +9,7 @@ import OrderManager from './OrderManager';
 import AdminManager from './AdminManager';
 import { useAuthStore } from '@/store/auth-store';
 import { useAppStore } from '@/store/app-store';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface DashboardStats {
   totalProducts: number;
@@ -56,7 +57,7 @@ export default function Dashboard() {
 
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard'],
-    queryFn: () => fetch('/api/dashboard').then((r) => r.json()),
+    queryFn: () => authFetch('/api/dashboard').then((r) => r.json()),
   });
 
   if (isLoading) {

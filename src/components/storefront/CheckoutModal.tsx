@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { X, CheckCircle, Loader2 } from 'lucide-react';
+import { X, CheckCircle, Loader2, Copy, MessageCircle, ArrowLeft } from 'lucide-react';
 import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
+import { motion } from 'framer-motion';
 
 const provinces = ZENYFIT_CONFIG.provinces;
 
@@ -19,6 +20,8 @@ interface CheckoutModalProps {
 export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   const { items, totalPrice, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
+  const [orderResult, setOrderResult] = useState<{ id: string; total: number } | null>(null);
+  const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({
     customerName: '',
     customerPhone: '',
@@ -28,6 +31,8 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   });
 
   if (!open) return null;
+
+  const orderIdShort = orderResult ? orderResult.id.slice(0, 8).toUpperCase() : '';
 
   const buildWhatsAppMessage = (orderId?: string) => {
     let msg = `*NOVO PEDIDO ${orderId ? `#${orderId.slice(-6).toUpperCase()}` : ''}*\n\n`;
@@ -42,6 +47,20 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     msg += `\n*TOTAL: ${totalPrice().toLocaleString('pt-MZ')} MTn*\n`;
     msg += `\n*Pagamento:* Na entrega`;
     return encodeURIComponent(msg);
+  };
+
+  const copyOrderId = () => {
+    if (orderIdShort) {
+      navigator.clipboard.writeText(orderIdShort);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const resetAndClose = () => {
+    setOrderResult(null);
+    setForm({ customerName: '', customerPhone: '', province: '', city: '', address: '' });
+    onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,19 +89,8 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
 
       if (res.ok) {
         const order = await res.json();
-        const whatsappUrl = `https://wa.me/${ZENYFIT_CONFIG.whatsapp}?text=${buildWhatsAppMessage(order.id)}`;
-
         clearCart();
-        onClose();
-
-        toast.success('Pedido realizado com sucesso!', {
-          description: 'Pode confirmar pelo WhatsApp para acompanhamento mais rápido.',
-          duration: 8000,
-          action: {
-            label: 'Enviar pelo WhatsApp',
-            onClick: () => window.open(whatsappUrl, '_blank'),
-          },
-        });
+        setOrderResult({ id: order.id, total: order.total });
       } else {
         toast.error('Erro ao realizar pedido. Tente novamente.');
       }
@@ -93,13 +101,99 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     }
   };
 
+  // Success screen
+  if (orderResult) {
+    const whatsappUrl = `https://wa.me/${ZENYFIT_CONFIG.whatsapp}?text=${buildWhatsAppMessage(orderResult.id)}`;
+
+    return (
+      <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50" onClick={resetAndClose}>
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0, y: 80 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
+          className="bg-white rounded-t-2xl sm:rounded-3xl max-w-md w-full shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="p-6 sm:p-8 text-center">
+            {/* Success icon */}
+            <motion.div
+              className="w-20 h-20 rounded-full bg-zeny-green/10 flex items-center justify-center mx-auto mb-5"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.1 }}
+            >
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.2 }}
+              >
+                <CheckCircle className="w-10 h-10 text-zeny-green" />
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h2 className="text-xl sm:text-2xl font-bold text-zeny-green-dark mb-2">Pedido Confirmado!</h2>
+              <p className="text-sm text-zeny-green-dark/60 mb-6">
+                O seu pedido foi registado com sucesso. Acompanhe o estado pelo WhatsApp.
+              </p>
+
+              {/* Order ID card */}
+              <div className="bg-zeny-green-card/50 rounded-xl p-4 mb-6">
+                <p className="text-xs text-zeny-green-dark/50 uppercase tracking-wider mb-1">Número do Pedido</p>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-2xl font-mono font-bold text-zeny-green-dark tracking-wider">
+                    #{orderIdShort}
+                  </span>
+                  <button
+                    onClick={copyOrderId}
+                    className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center transition-colors"
+                    title="Copiar número"
+                  >
+                    <Copy className={`w-4 h-4 ${copied ? 'text-zeny-green' : 'text-zeny-green-dark/40'}`} />
+                  </button>
+                </div>
+                <p className="text-xs text-zeny-green-dark/40 mt-1">
+                  Total: {orderResult.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="space-y-3">
+                <Button
+                  onClick={() => window.open(whatsappUrl, '_blank')}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full py-5 text-base font-semibold gap-2"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Confirmar pelo WhatsApp
+                </Button>
+                <Button
+                  onClick={resetAndClose}
+                  variant="outline"
+                  className="w-full rounded-full py-5 text-base font-medium border-zeny-green/20 text-zeny-green-dark hover:bg-zeny-green/5 gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Continuar a Comprar
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Checkout form
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/50" onClick={resetAndClose}>
       <div className="bg-white rounded-t-2xl sm:rounded-3xl max-w-md w-full max-h-[92vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="sticky top-0 bg-white p-3 sm:p-4 border-b border-zeny-green/10 flex items-center justify-between rounded-t-2xl sm:rounded-t-3xl z-10">
           <h2 className="text-base sm:text-lg font-bold text-zeny-green-dark">Finalizar Pedido</h2>
-          <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-zeny-green-card flex items-center justify-center -mr-1">
+          <button onClick={resetAndClose} className="w-10 h-10 rounded-full hover:bg-zeny-green-card flex items-center justify-center -mr-1">
             <X className="w-5 h-5 text-zeny-green-dark/60" />
           </button>
         </div>

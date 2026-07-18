@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Star, Eye, Package, Search } from 'lucide-react';
+import { ShoppingCart, Star, Eye, Package, Search, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,15 @@ interface Product {
 
 const categories = ['Todos', 'Skincare', 'Corpo', 'Suplementos', 'Aromaterapia', 'Cabelo'];
 
+type SortOption = 'recentes' | 'preco-asc' | 'preco-desc' | 'nome-asc';
+
+const sortLabels: Record<SortOption, string> = {
+  recentes: 'Mais recentes',
+  'preco-asc': 'Menor preço',
+  'preco-desc': 'Maior preço',
+  'nome-asc': 'Nome A-Z',
+};
+
 export default function ProductCatalog() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
@@ -30,6 +39,10 @@ export default function ProductCatalog() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  const [hideOutOfStock, setHideOutOfStock] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('recentes');
+  const [showFilters, setShowFilters] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
@@ -49,18 +62,50 @@ export default function ProductCatalog() {
   }, []);
 
   useEffect(() => {
-    let result = products;
+    let result = [...products];
+
+    // Category filter
     if (activeCategory !== 'Todos') {
       result = result.filter((p) => p.category === activeCategory);
     }
+
+    // Search filter
     if (search) {
       const s = search.toLowerCase();
       result = result.filter(
         (p) => p.name.toLowerCase().includes(s) || p.description.toLowerCase().includes(s)
       );
     }
+
+    // Featured filter
+    if (showFeaturedOnly) {
+      result = result.filter((p) => p.featured);
+    }
+
+    // Hide out of stock
+    if (hideOutOfStock) {
+      result = result.filter((p) => p.inStock);
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'preco-asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'preco-desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'nome-asc':
+        result.sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+        break;
+      case 'recentes':
+      default:
+        // Already ordered by createdAt desc from API, keep stable
+        break;
+    }
+
     setFiltered(result);
-  }, [products, activeCategory, search]);
+  }, [products, activeCategory, search, showFeaturedOnly, hideOutOfStock, sortBy]);
 
   const handleAddToCart = (product: Product) => {
     addItem({
@@ -95,16 +140,34 @@ export default function ProductCatalog() {
 
       {/* Search & Filter */}
       <ScrollReveal variant="fadeUp" delay={0.2}>
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1 max-w-full sm:max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zeny-green/40" />
-            <Input
-              placeholder="Pesquisar produtos..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 border-zeny-green/20 focus:border-zeny-green bg-white transition-colors duration-200"
-            />
+        <div className="flex flex-col gap-4 mb-6 sm:mb-8">
+          {/* Search + filter toggle row */}
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zeny-green/40" />
+              <Input
+                placeholder="Pesquisar produtos..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 border-zeny-green/20 focus:border-zeny-green bg-white transition-colors duration-200"
+              />
+            </div>
+            <motion.button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`h-10 px-3 rounded-lg border text-sm font-medium transition-colors flex items-center gap-2 ${
+                showFilters ? 'bg-zeny-green text-white border-zeny-green' : 'bg-white text-zeny-green-dark/70 border-zeny-green/20 hover:bg-zeny-green/5'
+              }`}
+              whileTap={{ scale: 0.95 }}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">Filtros</span>
+              {(showFeaturedOnly || hideOutOfStock || sortBy !== 'recentes') && (
+                <span className="w-2 h-2 rounded-full bg-white" />
+              )}
+            </motion.button>
           </div>
+
+          {/* Category pills */}
           <div className="flex gap-2 sm:flex-wrap overflow-x-auto sm:overflow-visible scroll-x-no-scrollbar pb-1 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
             {categories.map((cat, index) => (
               <motion.button
@@ -130,6 +193,87 @@ export default function ProductCatalog() {
               </motion.button>
             ))}
           </div>
+
+          {/* Extended filters panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="bg-white rounded-xl border border-zeny-green/10 p-4 flex flex-col sm:flex-row gap-4 sm:items-center">
+                  {/* Featured toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <button
+                      onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
+                      className={`w-9 h-5 rounded-full transition-colors duration-200 relative ${showFeaturedOnly ? 'bg-zeny-green' : 'bg-gray-200'}`}
+                    >
+                      <motion.span
+                        className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm"
+                        animate={{ left: showFeaturedOnly ? '18px' : '2px' }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      />
+                    </button>
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm text-zeny-green-dark/70">Apenas em destaque</span>
+                  </label>
+
+                  {/* Out of stock toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <button
+                      onClick={() => setHideOutOfStock(!hideOutOfStock)}
+                      className={`w-9 h-5 rounded-full transition-colors duration-200 relative ${hideOutOfStock ? 'bg-zeny-green' : 'bg-gray-200'}`}
+                    >
+                      <motion.span
+                        className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm"
+                        animate={{ left: hideOutOfStock ? '18px' : '2px' }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      />
+                    </button>
+                    <span className="text-sm text-zeny-green-dark/70">Ocultar esgotados</span>
+                  </label>
+
+                  {/* Sort */}
+                  <div className="flex items-center gap-2 sm:ml-auto">
+                    <span className="text-sm text-zeny-green-dark/50">Ordenar:</span>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as SortOption)}
+                      className="text-sm border border-zeny-green/20 rounded-lg px-3 py-1.5 bg-white text-zeny-green-dark focus:outline-none focus:border-zeny-green"
+                    >
+                      {Object.entries(sortLabels).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Active filter chips */}
+          {(showFeaturedOnly || hideOutOfStock || sortBy !== 'recentes') && (
+            <div className="flex flex-wrap gap-2">
+              {showFeaturedOnly && (
+                <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700 cursor-pointer hover:bg-amber-100" onClick={() => setShowFeaturedOnly(false)}>
+                  <Sparkles className="w-3 h-3 mr-1" /> Em destaque ✕
+                </Badge>
+              )}
+              {hideOutOfStock && (
+                <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700 cursor-pointer hover:bg-green-100" onClick={() => setHideOutOfStock(false)}>
+                  Sem esgotados ✕
+                </Badge>
+              )}
+              {sortBy !== 'recentes' && (
+                <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 cursor-pointer hover:bg-blue-100" onClick={() => setSortBy('recentes')}>
+                  {sortLabels[sortBy]} ✕
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
       </ScrollReveal>
 

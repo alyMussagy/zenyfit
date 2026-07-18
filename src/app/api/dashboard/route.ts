@@ -1,8 +1,12 @@
 import { supabase } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { validateAdmin, unauthorizedResponse } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { admin, error: authError } = await validateAdmin(request);
+    if (authError) return unauthorizedResponse(authError);
+
     // Total products
     const { count: totalProducts } = await supabase
       .from('Product')

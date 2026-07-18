@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import StoreHydrator from "@/components/StoreHydrator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#38B802" />
       </head>
       <body className={`${geistSans.variable} font-sans antialiased`}>
+        <StoreHydrator />
         {children}
         <Toaster />
       </body>

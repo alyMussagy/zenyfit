@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface Product {
   id: string;
@@ -42,7 +43,7 @@ export default function ProductManager() {
 
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ['products-admin', search],
-    queryFn: () => fetch(`/api/products?search=${search}`).then((r) => r.json()),
+    queryFn: () => authFetch(`/api/products?search=${search}`).then((r) => r.json()),
   });
 
   const resetForm = () => {
@@ -68,7 +69,7 @@ export default function ProductManager() {
   const handleDelete = async (id: string) => {
     if (!confirm('Tem certeza que deseja eliminar este produto?')) return;
     try {
-      await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      await authFetch(`/api/products/${id}`, { method: 'DELETE' });
       toast.success('Produto eliminado');
       queryClient.invalidateQueries({ queryKey: ['products-admin'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -92,7 +93,7 @@ export default function ProductManager() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/upload', {
+      const res = await authFetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
@@ -117,16 +118,14 @@ export default function ProductManager() {
     e.preventDefault();
     try {
       if (editingId) {
-        await fetch(`/api/products/${editingId}`, {
+        await authFetch(`/api/products/${editingId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
         });
         toast.success('Produto actualizado');
       } else {
-        await fetch('/api/products', {
+        await authFetch('/api/products', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
         });
         toast.success('Produto criado');

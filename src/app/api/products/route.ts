@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { validateAdmin, unauthorizedResponse } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,6 +32,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const { admin, error: authError, status } = await validateAdmin(request);
+    if (authError) return unauthorizedResponse(authError);
+
     const body = await request.json();
     const { name, description, price, image, category, inStock, featured } = body;
 

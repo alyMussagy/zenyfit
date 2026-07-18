@@ -4,10 +4,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Package, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
+import { Package, ChevronDown, ChevronUp, Search, MessageCircle, Trash2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { authFetch } from '@/lib/auth-fetch';
+
+const WHATSAPP_NUMBER = '258875775167';
 
 interface Order {
   id: string;
@@ -40,18 +44,42 @@ const statusColors: Record<string, string> = {
 
 export default function OrderManager() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const queryClient = useQueryClient();
 
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ['orders-admin'],
-    queryFn: () => fetch('/api/orders').then((r) => r.json()),
+    queryFn: () => authFetch('/api/orders').then((r) => r.json()),
   });
+
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
+    let result = [...orders];
+
+    if (search) {
+      const s = search.toLowerCase();
+      result = result.filter(
+        (o) =>
+          o.customerName.toLowerCase().includes(s) ||
+          o.customerPhone.includes(s) ||
+          o.id.toLowerCase().includes(s) ||
+          o.province.toLowerCase().includes(s) ||
+          o.city.toLowerCase().includes(s)
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      result = result.filter((o) => o.status === statusFilter);
+    }
+
+    return result;
+  }, [orders, search, statusFilter]);
 
   const updateStatus = async (orderId: string, status: string) => {
     try {
-      await fetch(`/api/orders/${orderId}`, {
+      await authFetch(`/api/orders/${orderId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
       toast.success(`Pedido actualizado para: ${status}`);
@@ -62,9 +90,51 @@ export default function OrderManager() {
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    if (!confirm('Tem certeza que deseja eliminar este pedido?')) return;
+    try {
+      await authFetch(`/api/orders/${orderId}`, { method: 'DELETE' });
+      toast.success('Pedido eliminado');
+      queryClient.invalidateQueries({ queryKey: ['orders-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    } catch {
+      toast.error('Erro ao eliminar pedido');
+    }
+  };
+
+  const openWhatsApp = (order: Order) => {
+    const items = order.items.map((i) => `  - ${i.productName} x${i.quantity} (${(i.price * i.quantity).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })})`).join('\n');
+    const message = `Olá ${order.customerName}! 👋\n\nAqui é da ZenyFit. O seu pedido *#${order.id.slice(0, 8)}* encontra-se com status: *${order.status.toUpperCase()}*\n\n*Itens:*\n${items}\n\n*Total:* ${order.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}\n\n*Entrega:* ${order.address}, ${order.city}, ${order.province}\n\nObrigado pela sua preferência! 💚`;
+    window.open(`https://wa.me/${order.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   return (
     <div className="animate-fade-in-up">
       <h2 className="text-xl font-bold text-gray-900 mb-6">Gestão de Pedidos</h2>
+
+      {/* Search & Filter */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Pesquisar por nome, telefone, ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue placeholder="Filtrar status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            {statusOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {isLoading ? (
         <div className="grid gap-3">
@@ -72,16 +142,19 @@ export default function OrderManager() {
             <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse" />
           ))}
         </div>
-      ) : orders?.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardContent className="py-16 text-center">
             <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-400">Nenhum pedido registado</p>
+            <p className="text-gray-400">
+              {orders?.length === 0 ? 'Nenhum pedido registado' : 'Nenhum pedido encontrado'}
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
-          {orders?.map((order) => (
+          <p className="text-xs text-gray-400 mb-2">{filteredOrders.length} pedido(s) encontrado(s)</p>
+          {filteredOrders.map((order) => (
             <Card key={order.id} className="border-0 shadow-sm overflow-hidden">
               <CardContent className="p-0">
                 <div className="p-4">
@@ -101,16 +174,26 @@ export default function OrderManager() {
                           {order.customerPhone} &middot; {order.province}, {order.city}
                         </p>
                         <p className="text-xs text-gray-400 mt-0.5">
-                          {new Date(order.createdAt).toLocaleString('pt-MZ')} &middot; {order.items.length} item(ns)
+                          {new Date(order.createdAt).toLocaleString('pt-MZ')} &middot; {order.items.length} item(ns) &middot; #{order.id.slice(0, 8)}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <span className="text-lg font-bold text-gray-900">
                         {order.total.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                       </span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        {/* WhatsApp button */}
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-8 h-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          onClick={() => openWhatsApp(order)}
+                          title="Contactar via WhatsApp"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </Button>
                         <Select
                           value={order.status}
                           onValueChange={(val) => updateStatus(order.id, val)}
@@ -134,6 +217,15 @@ export default function OrderManager() {
                             <ChevronDown className="w-4 h-4 text-gray-500" />
                           )}
                         </button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="w-8 h-8 text-red-400 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => deleteOrder(order.id)}
+                          title="Eliminar pedido"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
