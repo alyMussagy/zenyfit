@@ -12,6 +12,7 @@ import Footer from '@/components/storefront/Footer';
 import Dashboard from '@/components/dashboard/Dashboard';
 import LoginScreen from '@/components/dashboard/LoginScreen';
 import FloatingButtons from '@/components/storefront/WhatsAppButton';
+import OfferPopup from '@/components/storefront/OfferPopup';
 
 function StoreView() {
   return (
@@ -23,6 +24,7 @@ function StoreView() {
       </main>
       <Footer />
       <FloatingButtons />
+      <OfferPopup />
     </div>
   );
 }
