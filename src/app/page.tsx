@@ -1,7 +1,5 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { useAuthStore } from '@/store/auth-store';
 import Navbar from '@/components/storefront/Navbar';
@@ -33,10 +31,6 @@ function DashboardView() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const checkSession = useAuthStore((s) => s.checkSession);
 
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
-
   if (!isAuthenticated) {
     return <LoginScreen onSuccess={() => {}} />;
   }
@@ -46,14 +40,9 @@ function DashboardView() {
 
 export default function Home() {
   const { view } = useAppStore();
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: { staleTime: 30000, retry: 1 },
-    },
-  }));
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       {view === 'store' ? (
         <>
           <Navbar />
@@ -62,6 +51,6 @@ export default function Home() {
       ) : (
         <DashboardView />
       )}
-    </QueryClientProvider>
+    </>
   );
 }
