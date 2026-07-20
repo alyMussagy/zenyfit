@@ -15,7 +15,6 @@
   "/api/products/route": "/api/products",
   "/api/route": "/api",
   "/api/track/route": "/api/track",
-  "/api/upload/route": "/api/upload",
   "/page": "/",
   "/produto/[id]/page": "/produto/[id]"
 }

@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAdmin, unauthorizedResponse } from '@/lib/auth';
+import { randomUUID } from 'crypto';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
     const { name, description, price, image, category, inStock, featured, ingredients, howToUse, benefits, weight, additionalImages } = body;
 
     const { data, error } = await supabase.from('Product').insert({
+      id: randomUUID(),
       name,
       description,
       price: parseFloat(price),
