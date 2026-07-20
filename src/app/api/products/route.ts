@@ -53,10 +53,14 @@ export async function POST(request: NextRequest) {
       additionalImages: Array.isArray(additionalImages) ? additionalImages : [],
     }).select().single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return NextResponse.json({ error: 'Erro ao criar produto', details: error.message, code: error.code }, { status: 500 });
+    }
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error('Error creating product:', error);
-    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'Erro desconhecido';
+    return NextResponse.json({ error: 'Erro ao criar produto', details: msg }, { status: 500 });
   }
 }

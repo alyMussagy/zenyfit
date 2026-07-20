@@ -221,16 +221,26 @@ export default function ProductManager() {
       };
 
       if (editingId) {
-        await authFetch(`/api/products/${editingId}`, {
+        const res = await authFetch(`/api/products/${editingId}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.details || err.error || 'Erro ao actualizar produto');
+          return;
+        }
         toast.success('Produto actualizado');
       } else {
-        await authFetch('/api/products', {
+        const res = await authFetch('/api/products', {
           method: 'POST',
           body: JSON.stringify(payload),
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          toast.error(err.details || err.error || 'Erro ao criar produto');
+          return;
+        }
         toast.success('Produto criado');
       }
       resetForm();
