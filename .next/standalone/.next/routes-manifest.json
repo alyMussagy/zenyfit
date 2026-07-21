@@ -22,6 +22,14 @@
   },
   "dynamicRoutes": [
     {
+      "page": "/api/admin/reviews/[id]",
+      "regex": "^/api/admin/reviews/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/admin/reviews/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/api/admins/[id]",
       "regex": "^/api/admins/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -94,6 +102,12 @@
       "namedRegex": "^/api(?:/)?$"
     },
     {
+      "page": "/api/admin/reviews",
+      "regex": "^/api/admin/reviews(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/admin/reviews(?:/)?$"
+    },
+    {
       "page": "/api/admins",
       "regex": "^/api/admins(?:/)?$",
       "routeKeys": {},
@@ -136,16 +150,16 @@
       "namedRegex": "^/api/products/related(?:/)?$"
     },
     {
+      "page": "/api/reviews",
+      "regex": "^/api/reviews(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/reviews(?:/)?$"
+    },
+    {
       "page": "/api/track",
       "regex": "^/api/track(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/track(?:/)?$"
-    },
-    {
-      "page": "/api/upload",
-      "regex": "^/api/upload(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/upload(?:/)?$"
     }
   ],
   "dataRoutes": [],

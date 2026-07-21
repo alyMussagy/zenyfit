@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft, Bell, Sparkles } from 'lucide-react';
+import { Package, ShoppingCart, DollarSign, Clock, BarChart3, Shield, LogOut, ArrowLeft, Bell, Sparkles, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ProductManager from './ProductManager';
 import OrderManager from './OrderManager';
 import AdminManager from './AdminManager';
 import PopupManager from './PopupManager';
+import ReviewManager from './ReviewManager';
 import { useAuthStore } from '@/store/auth-store';
 import { useAppStore } from '@/store/app-store';
 import { authFetch } from '@/lib/auth-fetch';
@@ -36,7 +37,7 @@ interface Order {
   items: { productName: string; quantity: number; price: number }[];
 }
 
-type DashTab = 'overview' | 'products' | 'orders' | 'popups' | 'admins';
+type DashTab = 'overview' | 'products' | 'orders' | 'reviews' | 'popups' | 'admins';
 
 const statusColors: Record<string, string> = {
   pendente: 'bg-amber-100 text-amber-700',
@@ -62,6 +63,13 @@ export default function Dashboard() {
     queryKey: ['dashboard'],
     queryFn: () => authFetch('/api/dashboard').then((r) => r.json()),
   });
+
+  // Pending reviews count
+  const { data: pendingReviewsData } = useQuery<{ count: number }>({
+    queryKey: ['pending-reviews-count'],
+    queryFn: () => authFetch('/api/admin/reviews?status=pending').then((r) => r.json().then((d: any[]) => ({ count: d.length }))),
+  });
+  const pendingReviews = pendingReviewsData?.count || 0;
 
   // Poll for new orders every 30 seconds
   const lastPendingCount = useRef(0);
@@ -155,6 +163,7 @@ export default function Dashboard() {
             { id: 'overview' as DashTab, label: 'Visão Geral', icon: BarChart3 },
             { id: 'products' as DashTab, label: 'Produtos', icon: Package },
             { id: 'orders' as DashTab, label: 'Pedidos', icon: ShoppingCart },
+            { id: 'reviews' as DashTab, label: 'Avaliações', icon: MessageSquare, badge: pendingReviews },
             { id: 'popups' as DashTab, label: 'Popups', icon: Sparkles },
             ...(admin?.role === 'owner' ? [{ id: 'admins' as DashTab, label: 'Acessos', icon: Shield }] : []),
           ].map((tab) => (
@@ -169,6 +178,13 @@ export default function Dashboard() {
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
+              {tab.badge ? (
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                  activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-red-100 text-red-600'
+                }`}>
+                  {tab.badge}
+                </span>
+              ) : null}
             </button>
           ))}
         </div>
@@ -361,6 +377,7 @@ export default function Dashboard() {
 
         {activeTab === 'products' && <ProductManager />}
         {activeTab === 'orders' && <OrderManager />}
+        {activeTab === 'reviews' && <ReviewManager />}
         {activeTab === 'popups' && <PopupManager />}
         {activeTab === 'admins' && <AdminManager />}
       </div>

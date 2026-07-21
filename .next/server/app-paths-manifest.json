@@ -2,6 +2,8 @@
   "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/admin/page": "app/admin/page.js",
+  "/api/admin/reviews/[id]/route": "app/api/admin/reviews/[id]/route.js",
+  "/api/admin/reviews/route": "app/api/admin/reviews/route.js",
   "/api/admins/[id]/route": "app/api/admins/[id]/route.js",
   "/api/admins/route": "app/api/admins/route.js",
   "/api/auth/route": "app/api/auth/route.js",
@@ -13,9 +15,9 @@
   "/api/products/[id]/route": "app/api/products/[id]/route.js",
   "/api/products/related/route": "app/api/products/related/route.js",
   "/api/products/route": "app/api/products/route.js",
+  "/api/reviews/route": "app/api/reviews/route.js",
   "/api/route": "app/api/route.js",
   "/api/track/route": "app/api/track/route.js",
-  "/api/upload/route": "app/api/upload/route.js",
   "/page": "app/page.js",
   "/produto/[id]/page": "app/produto/[id]/page.js"
 }

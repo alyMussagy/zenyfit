@@ -2,6 +2,8 @@
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
   "/admin/page": "/admin",
+  "/api/admin/reviews/[id]/route": "/api/admin/reviews/[id]",
+  "/api/admin/reviews/route": "/api/admin/reviews",
   "/api/admins/[id]/route": "/api/admins/[id]",
   "/api/admins/route": "/api/admins",
   "/api/auth/route": "/api/auth",
@@ -13,9 +15,9 @@
   "/api/products/[id]/route": "/api/products/[id]",
   "/api/products/related/route": "/api/products/related",
   "/api/products/route": "/api/products",
+  "/api/reviews/route": "/api/reviews",
   "/api/route": "/api",
   "/api/track/route": "/api/track",
-  "/api/upload/route": "/api/upload",
   "/page": "/",
   "/produto/[id]/page": "/produto/[id]"
 }

@@ -41,6 +41,7 @@ import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
 import type { Product } from '@/types/product';
+import ProductReviews, { MiniStarRating } from '@/components/storefront/ProductReviews';
 
 /* ─── Category icon map ─── */
 const categoryIcons: Record<string, React.ElementType> = {
@@ -75,7 +76,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
   const [product, setProduct] = useState<Product>(initialProduct);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
-  const [activeTab, setActiveTab] = useState<'descricao' | 'beneficios' | 'ingredientes' | 'modo-usar' | 'faq'>('descricao');
+  const [activeTab, setActiveTab] = useState<'descricao' | 'beneficios' | 'ingredientes' | 'modo-usar' | 'avaliacoes' | 'faq'>('descricao');
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [imageZoom, setImageZoom] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -354,14 +355,9 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
               {product.name}
             </h1>
 
-            {/* Rating placeholder (visual) */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                ))}
-              </div>
-              <span className="text-sm text-gray-400">(0 avaliações)</span>
+            {/* Rating */}
+            <div className="mb-4">
+              <MiniStarRating productId={product.id} />
             </div>
 
             {/* Price */}
@@ -473,6 +469,7 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
                 {product.howToUse?.trim() && (
                   <TabBtn active={activeTab === 'modo-usar'} onClick={() => setActiveTab('modo-usar')}>Modo de Usar</TabBtn>
                 )}
+                <TabBtn active={activeTab === 'avaliacoes'} onClick={() => setActiveTab('avaliacoes')}>Avaliações</TabBtn>
                 <TabBtn active={activeTab === 'faq'} onClick={() => setActiveTab('faq')}>Perguntas</TabBtn>
               </div>
 
@@ -576,6 +573,12 @@ export default function ProductPageClient({ initialProduct }: { initialProduct: 
                         </div>
                       </div>
                     </div>
+                  </TabPanel>
+                )}
+
+                {activeTab === 'avaliacoes' && (
+                  <TabPanel key="rev">
+                    <ProductReviews productId={product.id} />
                   </TabPanel>
                 )}
 

@@ -1,0 +1,783 @@
+     1→'use client';
+     2→
+     3→import { useState, useEffect, useRef } from 'react';
+     4→import { useParams, useRouter } from 'next/navigation';
+     5→import { motion, AnimatePresence } from 'framer-motion';
+     6→import {
+     7→  ArrowLeft,
+     8→  Minus,
+     9→  Plus,
+    10→  ShoppingCart,
+    11→  Check,
+    12→  Truck,
+    13→  Shield,
+    14→  Clock,
+    15→  Package,
+    16→  Sparkles,
+    17→  MessageCircle,
+    18→  ChevronRight,
+    19→  ChevronDown,
+    20→  Heart,
+    21→  Share2,
+    22→  ZoomIn,
+    23→  X,
+    24→  Leaf,
+    25→  Droplets,
+    26→  Hand,
+    27→  Pill,
+    28→  Flower2,
+    29→  Scissors,
+    30→  Info,
+    31→  Star,
+    32→  RotateCcw,
+    33→  CreditCard,
+    34→  MapPin,
+    35→  Phone,
+    36→  AlertCircle,
+    37→} from 'lucide-react';
+    38→import { Badge } from '@/components/ui/badge';
+    39→import { Button } from '@/components/ui/button';
+    40→import { useCartStore } from '@/store/cart-store';
+    41→import { toast } from 'sonner';
+    42→import { ZENYFIT_CONFIG } from '@/lib/zenyfit-config';
+    43→import type { Product } from '@/types/product';
+    44→
+    45→/* ─── Category icon map ─── */
+    46→const categoryIcons: Record<string, React.ElementType> = {
+    47→  Skincare: Droplets,
+    48→  Corpo: Hand,
+    49→  Suplementos: Pill,
+    50→  Aromaterapia: Flower2,
+    51→  Cabelo: Scissors,
+    52→};
+    53→
+    54→/* ─── Trust badges config ─── */
+    55→const trustBadges = [
+    56→  { icon: Truck, title: 'Entrega Rápida', desc: 'Maputo e Matola' },
+    57→  { icon: Shield, title: 'Pagamento na Entrega', desc: 'Pague quando receber' },
+    58→  { icon: Clock, title: 'Suporte 8h-18h', desc: 'Seg a Sex' },
+    59→  { icon: RotateCcw, title: 'Devolução Fácil', desc: 'Em até 48h' },
+    60→];
+    61→
+    62→/* ─── FAQ default items ─── */
+    63→const defaultFaqs = [
+    64→  { q: 'Este produto é original?', a: 'Sim, todos os nossos produtos são 100% originais, adquiridos directamente de distribuidores autorizados. A ZenyFit garante a autenticidade de cada item vendido na nossa loja.' },
+    65→  { q: 'Como funciona a entrega?', a: 'Realizamos entregas em Maputo Cidade e Maputo Província (Matola). O custo de entrega é confirmado pelo nosso atendente via WhatsApp após a confirmação do pedido. O pagamento é feito na entrega.' },
+    66→  { q: 'Posso devolver o produto?', a: 'Sim, aceitamos devoluções em até 48 horas após o recebimento, desde que o produto esteja lacrado e na embalagem original. Entre em contacto connosco pelo WhatsApp para iniciar o processo.' },
+    67→  { q: 'Quanto tempo demora a entrega?', a: 'As entregas em Maputo Cidade são feitas geralmente em 1-2 dias úteis. Para Matola, o prazo é de 2-3 dias úteis. O atendente confirma o prazo exacto após o pedido.' },
+    68→];
+    69→
+    70→export default function ProductPageClient({ initialProduct }: { initialProduct: Product }) {
+    71→  const router = useRouter();
+    72→  const params = useParams();
+    73→  const productId = params.id as string;
+    74→
+    75→  const [product, setProduct] = useState<Product>(initialProduct);
+    76→  const [quantity, setQuantity] = useState(1);
+    77→  const [activeImage, setActiveImage] = useState(0);
+    78→  const [activeTab, setActiveTab] = useState<'descricao' | 'beneficios' | 'ingredientes' | 'modo-usar' | 'faq'>('descricao');
+    79→  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    80→  const [imageZoom, setImageZoom] = useState(false);
+    81→  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+    82→  const [isFavorited, setIsFavorited] = useState(false);
+    83→  const [showShareMenu, setShowShareMenu] = useState(false);
+    84→
+    85→  const addItem = useCartStore((s) => s.addItem);
+    86→  const cartItems = useCartStore((s) => s.items);
+    87→
+    88→  const allImages = [
+    89→    product?.image || '',
+    90→    ...(product?.additionalImages || []).filter(Boolean),
+    91→  ].filter(Boolean);
+    92→
+    93→  // Fetch related products
+    94→  useEffect(() => {
+    95→    if (product?.category) {
+    96→      fetch(`/api/products/related?category=${encodeURIComponent(product.category)}&excludeId=${product.id}&limit=4`)
+    97→        .then((r) => r.json())
+    98→        .then((data) => setRelatedProducts(Array.isArray(data) ? data : []))
+    99→        .catch(() => {});
+   100→    }
+   101→  }, [product?.category, product?.id]);
+   102→
+   103→  // Check favorite state from localStorage
+   104→  useEffect(() => {
+   105→    try {
+   106→      const favs: string[] = JSON.parse(localStorage.getItem('zenyfit-favorites') || '[]');
+   107→      setIsFavorited(favs.includes(productId));
+   108→    } catch {}
+   109→  }, [productId]);
+   110→
+   111→  const handleAddToCart = () => {
+   112→    if (!product || !product.inStock) return;
+   113→    const current = cartItems.find((i) => i.productId === product.id);
+   114→    const currentQty = current ? current.quantity : 0;
+   115→    if (currentQty + quantity > 10) {
+   116→      toast.warning('Quantidade máxima atingida (10 unidades)');
+   117→      return;
+   118→    }
+   119→    for (let i = 0; i < quantity; i++) {
+   120→      addItem({
+   121→        productId: product.id,
+   122→        name: product.name,
+   123→        price: product.price,
+   124→        image: product.image,
+   125→      });
+   126→    }
+   127→    toast.success(`${quantity}x ${product.name} adicionado ao carrinho!`);
+   128→  };
+   129→
+   130→  const handleWhatsApp = () => {
+   131→    if (!product) return;
+   132→    const msg = encodeURIComponent(
+   133→      `Olá ZenyFit! Gostaria de saber mais sobre: *${product.name}*\nPreço: ${product.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}${product.weight ? `\nTamanho: ${product.weight}` : ''}\n\nPodem dar-me mais informações?`
+   134→    );
+   135→    window.open(`https://wa.me/${ZENYFIT_CONFIG.whatsapp}?text=${msg}`, '_blank');
+   136→  };
+   137→
+   138→  const toggleFavorite = () => {
+   139→    try {
+   140→      const favs: string[] = JSON.parse(localStorage.getItem('zenyfit-favorites') || '[]');
+   141→      if (favs.includes(productId)) {
+   142→        const updated = favs.filter((f) => f !== productId);
+   143→        localStorage.setItem('zenyfit-favorites', JSON.stringify(updated));
+   144→        setIsFavorited(false);
+   145→        toast.info('Removido dos favoritos');
+   146→      } else {
+   147→        favs.push(productId);
+   148→        localStorage.setItem('zenyfit-favorites', JSON.stringify(favs));
+   149→        setIsFavorited(true);
+   150→        toast.success('Adicionado aos favoritos!');
+   151→      }
+   152→    } catch {}
+   153→  };
+   154→
+   155→  const handleShare = (method: 'native' | 'whatsapp' | 'copy') => {
+   156→    const url = window.location.href;
+   157→    const text = `${product.name} - ${product.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })} | ZenyFit`;
+   158→    if (method === 'native' && navigator.share) {
+   159→      navigator.share({ title: product.name, text, url });
+   160→    } else if (method === 'whatsapp') {
+   161→      window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+   162→    } else {
+   163→      navigator.clipboard.writeText(url);
+   164→      toast.success('Link copiado!');
+   165→    }
+   166→    setShowShareMenu(false);
+   167→  };
+   168→
+   169→  const hasDetails =
+   170→    (product?.ingredients?.length && product.ingredients.some((i) => i.trim())) ||
+   171→    product?.howToUse?.trim() ||
+   172→    (product?.benefits?.length && product.benefits.some((b) => b.trim()));
+   173→
+   174→  const CatIcon = categoryIcons[product.category] || Package;
+   175→
+   176→  if (!product) return null;
+   177→
+   178→  return (
+   179→    <div className="min-h-screen bg-white">
+   180→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+   181→        {/* ─── BREADCRUMB ─── */}
+   182→        <nav className="flex items-center gap-1.5 text-sm text-zeny-green-dark/50 mb-6 overflow-x-auto">
+   183→          <button onClick={() => router.push('/')} className="hover:text-zeny-green-dark transition-colors whitespace-nowrap">
+   184→            Início
+   185→          </button>
+   186→          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+   187→          <button onClick={() => router.push('/#produtos')} className="hover:text-zeny-green-dark transition-colors whitespace-nowrap">
+   188→            Produtos
+   189→          </button>
+   190→          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+   191→          <button onClick={() => router.push(`/#produtos`)} className="hover:text-zeny-green-dark transition-colors whitespace-nowrap">
+   192→            {product.category}
+   193→          </button>
+   194→          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+   195→          <span className="text-zeny-green-dark font-medium truncate max-w-[200px]">{product.name}</span>
+   196→        </nav>
+   197→
+   198→        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
+   199→          {/* ════════════════════ LEFT: IMAGE GALLERY ════════════════════ */}
+   200→          <motion.div
+   201→            initial={{ opacity: 0, x: -20 }}
+   202→            animate={{ opacity: 1, x: 0 }}
+   203→            transition={{ duration: 0.5 }}
+   204→          >
+   205→            {/* Main image with zoom button */}
+   206→            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-3 group cursor-zoom-in" onClick={() => allImages.length > 0 && setImageZoom(true)}>
+   207→              <AnimatePresence mode="wait">
+   208→                <motion.img
+   209→                  key={allImages[activeImage] || 'empty'}
+   210→                  src={allImages[activeImage] || ''}
+   211→                  alt={product.name}
+   212→                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+   213→                  initial={{ opacity: 0 }}
+   214→                  animate={{ opacity: 1 }}
+   215→                  exit={{ opacity: 0 }}
+   216→                  transition={{ duration: 0.3 }}
+   217→                  onError={(e) => {
+   218→                    const target = e.target as HTMLImageElement;
+   219→                    target.style.display = 'none';
+   220→                    const parent = target.parentElement;
+   221→                    if (parent && !parent.querySelector('.img-fallback')) {
+   222→                      parent.innerHTML = '<div class="img-fallback flex items-center justify-center w-full h-full bg-gray-100"><svg class="w-16 h-16 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
+   223→                    }
+   224→                  }}
+   225→                />
+   226→              </AnimatePresence>
+   227→              {/* Zoom overlay */}
+   228→              <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+   229→                <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+   230→                  <ZoomIn className="w-5 h-5 text-white" />
+   231→                </div>
+   232→              </div>
+   233→              {/* Badges */}
+   234→              {!product.inStock && (
+   235→                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+   236→                  <span className="text-white font-semibold bg-black/60 px-5 py-2.5 rounded-full text-sm flex items-center gap-2">
+   237→                    <AlertCircle className="w-4 h-4" /> Esgotado
+   238→                  </span>
+   239→                </div>
+   240→              )}
+   241→              {product.featured && product.inStock && (
+   242→                <Badge className="absolute top-4 left-4 bg-zeny-green text-white text-xs shadow-lg">
+   243→                  <Sparkles className="w-3 h-3 mr-1" />Destaque
+   244→                </Badge>
+   245→              )}
+   246→              {/* Image counter */}
+   247→              {allImages.length > 1 && (
+   248→                <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full">
+   249→                  {activeImage + 1} / {allImages.length}
+   250→                </div>
+   251→              )}
+   252→            </div>
+   253→
+   254→            {/* Thumbnails */}
+   255→            {allImages.length > 1 && (
+   256→              <div className="flex gap-2 overflow-x-auto pb-1">
+   257→                {allImages.map((img, i) => (
+   258→                  <button
+   259→                    key={i}
+   260→                    onClick={() => setActiveImage(i)}
+   261→                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all ${
+   262→                      activeImage === i ? 'border-zeny-green shadow-md ring-2 ring-zeny-green/20' : 'border-gray-200 hover:border-gray-300'
+   263→                    }`}
+   264→                  >
+   265→                    <img
+   266→                      src={img}
+   267→                      alt={`${product.name} - imagem ${i + 1}`}
+   268→                      className="w-full h-full object-cover"
+   269→                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+   270→                    />
+   271→                  </button>
+   272→                ))}
+   273→              </div>
+   274→            )}
+   275→
+   276→            {/* Mobile trust badges */}
+   277→            <div className="grid grid-cols-2 gap-2 mt-4 lg:hidden">
+   278→              {trustBadges.map((badge) => {
+   279→                const Icon = badge.icon;
+   280→                return (
+   281→                  <div key={badge.title} className="flex items-center gap-2.5 p-3 bg-gray-50 rounded-xl">
+   282→                    <Icon className="w-5 h-5 text-zeny-green flex-shrink-0" />
+   283→                    <div>
+   284→                      <p className="text-xs font-semibold text-gray-900">{badge.title}</p>
+   285→                      <p className="text-[10px] text-gray-500">{badge.desc}</p>
+   286→                    </div>
+   287→                  </div>
+   288→                );
+   289→              })}
+   290→            </div>
+   291→          </motion.div>
+   292→
+   293→          {/* ════════════════════ RIGHT: PRODUCT INFO ════════════════════ */}
+   294→          <motion.div
+   295→            initial={{ opacity: 0, x: 20 }}
+   296→            animate={{ opacity: 1, x: 0 }}
+   297→            transition={{ duration: 0.5, delay: 0.1 }}
+   298→            className="flex flex-col"
+   299→          >
+   300→            {/* Category + actions row */}
+   301→            <div className="flex items-center justify-between mb-3">
+   302→              <div className="flex items-center gap-2">
+   303→                <CatIcon className="w-4 h-4 text-zeny-green" />
+   304→                <Badge variant="secondary" className="text-xs uppercase tracking-wider bg-zeny-green/10 text-zeny-green-dark border-0">
+   305→                  {product.category}
+   306→                </Badge>
+   307→                {product.weight && (
+   308→                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">{product.weight}</span>
+   309→                )}
+   310→              </div>
+   311→              <div className="flex items-center gap-1">
+   312→                <motion.button
+   313→                  onClick={toggleFavorite}
+   314→                  whileTap={{ scale: 0.85 }}
+   315→                  className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-pink-50 transition-colors"
+   316→                >
+   317→                  <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-pink-500 text-pink-500' : 'text-gray-400'}`} />
+   318→                </motion.button>
+   319→                <div className="relative">
+   320→                  <motion.button
+   321→                    onClick={() => setShowShareMenu(!showShareMenu)}
+   322→                    whileTap={{ scale: 0.85 }}
+   323→                    className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+   324→                  >
+   325→                    <Share2 className="w-5 h-5 text-gray-400" />
+   326→                  </motion.button>
+   327→                  <AnimatePresence>
+   328→                    {showShareMenu && (
+   329→                      <motion.div
+   330→                        initial={{ opacity: 0, y: -5, scale: 0.95 }}
+   331→                        animate={{ opacity: 1, y: 0, scale: 1 }}
+   332→                        exit={{ opacity: 0, y: -5, scale: 0.95 }}
+   333→                        className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-gray-100 py-2 w-48 z-50"
+   334→                      >
+   335→                        <button onClick={() => handleShare('native')} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+   336→                          <Share2 className="w-4 h-4" /> Partilhar...
+   337→                        </button>
+   338→                        <button onClick={() => handleShare('whatsapp')} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+   339→                          <MessageCircle className="w-4 h-4 text-green-500" /> WhatsApp
+   340→                        </button>
+   341→                        <button onClick={() => handleShare('copy')} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+   342→                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+   343→                          Copiar link
+   344→                        </button>
+   345→                      </motion.div>
+   346→                    )}
+   347→                  </AnimatePresence>
+   348→                </div>
+   349→              </div>
+   350→            </div>
+   351→
+   352→            {/* Title */}
+   353→            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+   354→              {product.name}
+   355→            </h1>
+   356→
+   357→            {/* Rating placeholder (visual) */}
+   358→            <div className="flex items-center gap-2 mb-4">
+   359→              <div className="flex items-center gap-0.5">
+   360→                {[1, 2, 3, 4, 5].map((s) => (
+   361→                  <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
+   362→                ))}
+   363→              </div>
+   364→              <span className="text-sm text-gray-400">(0 avaliações)</span>
+   365→            </div>
+   366→
+   367→            {/* Price */}
+   368→            <div className="flex items-baseline gap-3 mb-5 pb-5 border-b border-gray-100">
+   369→              <span className="text-3xl sm:text-4xl font-bold text-zeny-green-dark">
+   370→                {product.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+   371→              </span>
+   372→            </div>
+   373→
+   374→            {/* Short description */}
+   375→            <p className="text-gray-600 leading-relaxed mb-6 text-[15px]">
+   376→              {product.description}
+   377→            </p>
+   378→
+   379→            {/* Desktop trust badges */}
+   380→            <div className="hidden lg:grid grid-cols-4 gap-3 mb-6">
+   381→              {trustBadges.map((badge) => {
+   382→                const Icon = badge.icon;
+   383→                return (
+   384→                  <div key={badge.title} className="flex flex-col items-center text-center gap-1.5 p-3 bg-gray-50 rounded-xl">
+   385→                    <Icon className="w-5 h-5 text-zeny-green" />
+   386→                    <span className="text-xs font-semibold text-gray-900">{badge.title}</span>
+   387→                    <span className="text-[10px] text-gray-500 leading-tight">{badge.desc}</span>
+   388→                  </div>
+   389→                );
+   390→              })}
+   391→            </div>
+   392→
+   393→            {/* Quantity + Add to Cart */}
+   394→            {product.inStock ? (
+   395→              <div className="flex gap-3 mb-3">
+   396→                <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+   397→                  <button
+   398→                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+   399→                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors"
+   400→                  >
+   401→                    <Minus className="w-4 h-4 text-gray-500" />
+   402→                  </button>
+   403→                  <span className="w-14 h-12 flex items-center justify-center text-sm font-semibold text-gray-900 border-x border-gray-200">
+   404→                    {quantity}
+   405→                  </span>
+   406→                  <button
+   407→                    onClick={() => setQuantity(Math.min(10, quantity + 1))}
+   408→                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 transition-colors"
+   409→                  >
+   410→                    <Plus className="w-4 h-4 text-gray-500" />
+   411→                  </button>
+   412→                </div>
+   413→                <Button
+   414→                  onClick={handleAddToCart}
+   415→                  className="flex-1 h-12 bg-zeny-green hover:bg-zeny-green-dark text-white rounded-xl font-semibold text-sm transition-all hover:shadow-lg hover:shadow-zeny-green/20"
+   416→                >
+   417→                  <ShoppingCart className="w-4 h-4 mr-2" />
+   418→                  Adicionar ao Carrinho
+   419→                </Button>
+   420→              </div>
+   421→            ) : (
+   422→              <div className="flex items-center gap-3 mb-3 p-4 bg-red-50 rounded-xl border border-red-100">
+   423→                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+   424→                <div>
+   425→                  <p className="text-sm font-semibold text-red-700">Produto esgotado</p>
+   426→                  <p className="text-xs text-red-500">Entre em contacto pelo WhatsApp para saber quando estará disponível</p>
+   427→                </div>
+   428→              </div>
+   429→            )}
+   430→
+   431→            {/* WhatsApp CTA */}
+   432→            <button
+   433→              onClick={handleWhatsApp}
+   434→              className="w-full h-12 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors mb-4"
+   435→            >
+   436→              <MessageCircle className="w-5 h-5" />
+   437→              Perguntar pelo WhatsApp
+   438→            </button>
+   439→
+   440→            {/* Delivery info box */}
+   441→            <div className="p-4 bg-zeny-green/5 border border-zeny-green/10 rounded-xl mb-8">
+   442→              <div className="flex items-start gap-3">
+   443→                <MapPin className="w-5 h-5 text-zeny-green flex-shrink-0 mt-0.5" />
+   444→                <div>
+   445→                  <p className="text-sm font-semibold text-gray-900 mb-1">Entrega em Maputo e Matola</p>
+   446→                  <p className="text-xs text-gray-500 leading-relaxed">
+   447→                    O custo de entrega é confirmado pelo nosso atendente via WhatsApp após a confirmação do seu pedido.
+   448→                    Pagamento feito na entrega (Cash on Delivery).
+   449→                  </p>
+   450→                  <a
+   451→                    href={`https://wa.me/${ZENYFIT_CONFIG.whatsapp}?text=${encodeURIComponent('Olá! Gostaria de saber sobre o custo de entrega.')}`}
+   452→                    target="_blank"
+   453→                    rel="noopener noreferrer"
+   454→                    className="inline-flex items-center gap-1.5 text-xs font-medium text-zeny-green hover:text-zeny-green-dark mt-2 transition-colors"
+   455→                  >
+   456→                    <Phone className="w-3.5 h-3.5" /> Perguntar sobre entrega
+   457→                  </a>
+   458→                </div>
+   459→              </div>
+   460→            </div>
+   461→
+   462→            {/* ════════════════════ RICH TABS ════════════════════ */}
+   463→            <div className="border-t border-gray-100 pt-6">
+   464→              {/* Tab buttons */}
+   465→              <div className="flex gap-1 mb-6 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+   466→                <TabBtn active={activeTab === 'descricao'} onClick={() => setActiveTab('descricao')}>Descrição</TabBtn>
+   467→                {product.benefits?.some((b) => b.trim()) && (
+   468→                  <TabBtn active={activeTab === 'beneficios'} onClick={() => setActiveTab('beneficios')}>Benefícios</TabBtn>
+   469→                )}
+   470→                {product.ingredients?.some((i) => i.trim()) && (
+   471→                  <TabBtn active={activeTab === 'ingredientes'} onClick={() => setActiveTab('ingredientes')}>Ingredientes</TabBtn>
+   472→                )}
+   473→                {product.howToUse?.trim() && (
+   474→                  <TabBtn active={activeTab === 'modo-usar'} onClick={() => setActiveTab('modo-usar')}>Modo de Usar</TabBtn>
+   475→                )}
+   476→                <TabBtn active={activeTab === 'faq'} onClick={() => setActiveTab('faq')}>Perguntas</TabBtn>
+   477→              </div>
+   478→
+   479→              {/* Tab content */}
+   480→              <AnimatePresence mode="wait">
+   481→                {activeTab === 'descricao' && (
+   482→                  <TabPanel key="desc">
+   483→                    <div className="space-y-4">
+   484→                      <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+   485→                      {product.weight && (
+   486→                        <div className="flex items-center gap-2 text-sm text-gray-500">
+   487→                          <Package className="w-4 h-4 text-zeny-green" />
+   488→                          <span><span className="font-medium text-gray-700">Quantidade:</span> {product.weight}</span>
+   489→                        </div>
+   490→                      )}
+   491→                      <div className="flex items-center gap-2 text-sm text-gray-500">
+   492→                        <CreditCard className="w-4 h-4 text-zeny-green" />
+   493→                        <span><span className="font-medium text-gray-700">Pagamento:</span> Cash on Delivery (pagamento na entrega)</span>
+   494→                      </div>
+   495→                      {product.category && (
+   496→                        <div className="flex items-center gap-2 text-sm text-gray-500">
+   497→                          {(() => { const CI = categoryIcons[product.category] || Package; return <CI className="w-4 h-4 text-zeny-green" />; })()}
+   498→                          <span><span className="font-medium text-gray-700">Categoria:</span> {product.category}</span>
+   499→                        </div>
+   500→                      )}
+   501→                    </div>
+   502→                  </TabPanel>
+   503→                )}
+   504→
+   505→                {activeTab === 'beneficios' && (
+   506→                  <TabPanel key="ben">
+   507→                    <div className="space-y-3">
+   508→                      <p className="text-sm text-gray-500 mb-4">Conheça os principais benefícios deste produto para a sua saúde e bem-estar:</p>
+   509→                      <div className="grid sm:grid-cols-2 gap-3">
+   510→                        {product.benefits?.filter((b) => b.trim()).map((item, i) => (
+   511→                          <motion.div
+   512→                            key={i}
+   513→                            initial={{ opacity: 0, y: 10 }}
+   514→                            animate={{ opacity: 1, y: 0 }}
+   515→                            transition={{ delay: i * 0.08 }}
+   516→                            className="flex items-start gap-3 p-3 bg-green-50 rounded-xl border border-green-100"
+   517→                          >
+   518→                            <div className="w-6 h-6 rounded-full bg-zeny-green/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+   519→                              <Check className="w-3.5 h-3.5 text-zeny-green" strokeWidth={3} />
+   520→                            </div>
+   521→                            <span className="text-sm text-gray-700 leading-relaxed">{item}</span>
+   522→                          </motion.div>
+   523→                        ))}
+   524→                      </div>
+   525→                    </div>
+   526→                  </TabPanel>
+   527→                )}
+   528→
+   529→                {activeTab === 'ingredientes' && (
+   530→                  <TabPanel key="ing">
+   531→                    <div className="space-y-3">
+   532→                      <p className="text-sm text-gray-500 mb-4">Lista de ingredientes presentes na composição deste produto:</p>
+   533→                      <div className="bg-amber-50/60 border border-amber-100 rounded-xl p-4">
+   534→                        <div className="flex items-start gap-2 mb-3">
+   535→                          <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+   536→                          <p className="text-xs text-amber-700 leading-relaxed">
+   537→                            Antes de utilizar, verifique se tem alergia a algum dos ingredientes listados abaixo.
+   538→                            Em caso de irritação, suspenda o uso e consulte um profissional de saúde.
+   539→                          </p>
+   540→                        </div>
+   541→                        <ul className="space-y-2">
+   542→                          {product.ingredients?.filter((i) => i.trim()).map((item, i) => (
+   543→                            <li key={i} className="flex items-start gap-2.5">
+   544→                              <div className="w-2 h-2 rounded-full bg-zeny-green flex-shrink-0 mt-1.5" />
+   545→                              <span className="text-sm text-gray-700">{item}</span>
+   546→                            </li>
+   547→                          ))}
+   548→                        </ul>
+   549→                      </div>
+   550→                    </div>
+   551→                  </TabPanel>
+   552→                )}
+   553→
+   554→                {activeTab === 'modo-usar' && (
+   555→                  <TabPanel key="how">
+   556→                    <div className="space-y-4">
+   557→                      <p className="text-sm text-gray-500">Siga as instruções abaixo para obter os melhores resultados:</p>
+   558→                      <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5">
+   559→                        <div className="flex items-start gap-3 mb-4">
+   560→                          <Droplets className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+   561→                          <p className="text-sm font-semibold text-gray-900">Instruções de Uso</p>
+   562→                        </div>
+   563→                        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+   564→                          {product.howToUse}
+   565→                        </div>
+   566→                      </div>
+   567→                      <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+   568→                        <Leaf className="w-5 h-5 text-zeny-green flex-shrink-0 mt-0.5" />
+   569→                        <div>
+   570→                          <p className="text-xs font-semibold text-gray-900 mb-1">Dica ZenyFit</p>
+   571→                          <p className="text-xs text-gray-500 leading-relaxed">
+   572→                            Para melhores resultados, utilize o produto regularmente conforme indicado.
+   573→                            Combine com uma alimentação equilibrada e hábitos saudáveis.
+   574→                            Em caso de dúvidas, fale connosco pelo WhatsApp.
+   575→                          </p>
+   576→                        </div>
+   577→                      </div>
+   578→                    </div>
+   579→                  </TabPanel>
+   580→                )}
+   581→
+   582→                {activeTab === 'faq' && (
+   583→                  <TabPanel key="faq">
+   584→                    <div className="space-y-2">
+   585→                      <p className="text-sm text-gray-500 mb-4">Perguntas frequentes sobre este produto:</p>
+   586→                      {defaultFaqs.map((faq, i) => (
+   587→                        <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
+   588→                          <button
+   589→                            onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+   590→                            className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+   591→                          >
+   592→                            <span className="text-sm font-medium text-gray-900 pr-4">{faq.q}</span>
+   593→                            <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${expandedFaq === i ? 'rotate-180' : ''}`} />
+   594→                          </button>
+   595→                          <AnimatePresence>
+   596→                            {expandedFaq === i && (
+   597→                              <motion.div
+   598→                                initial={{ height: 0, opacity: 0 }}
+   599→                                animate={{ height: 'auto', opacity: 1 }}
+   600→                                exit={{ height: 0, opacity: 0 }}
+   601→                                transition={{ duration: 0.2 }}
+   602→                                className="overflow-hidden"
+   603→                              >
+   604→                                <p className="px-4 pb-4 text-sm text-gray-600 leading-relaxed">{faq.a}</p>
+   605→                              </motion.div>
+   606→                            )}
+   607→                          </AnimatePresence>
+   608→                        </div>
+   609→                      ))}
+   610→                    </div>
+   611→                  </TabPanel>
+   612→                )}
+   613→              </AnimatePresence>
+   614→            </div>
+   615→          </motion.div>
+   616→        </div>
+   617→
+   618→        {/* ════════════════════ RELATED PRODUCTS ════════════════════ */}
+   619→        {relatedProducts.length > 0 && (
+   620→          <motion.section
+   621→            initial={{ opacity: 0, y: 30 }}
+   622→            whileInView={{ opacity: 1, y: 0 }}
+   623→            viewport={{ once: true, margin: '-50px' }}
+   624→            transition={{ duration: 0.5 }}
+   625→            className="mt-16 sm:mt-24"
+   626→          >
+   627→            <div className="flex items-center justify-between mb-8">
+   628→              <div>
+   629→                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Produtos Relacionados</h2>
+   630→                <p className="text-sm text-gray-500 mt-1">Você também pode gostar destes produtos</p>
+   631→              </div>
+   632→              <button
+   633→                onClick={() => router.push('/#produtos')}
+   634→                className="text-sm text-zeny-green hover:text-zeny-green-dark font-medium flex items-center gap-1 transition-colors"
+   635→              >
+   636→                Ver todos <ChevronRight className="w-4 h-4" />
+   637→              </button>
+   638→            </div>
+   639→            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+   640→              {relatedProducts.map((rp, index) => (
+   641→                <motion.div
+   642→                  key={rp.id}
+   643→                  initial={{ opacity: 0, y: 20 }}
+   644→                  whileInView={{ opacity: 1, y: 0 }}
+   645→                  viewport={{ once: true }}
+   646→                  transition={{ delay: index * 0.08, duration: 0.4 }}
+   647→                >
+   648→                  <RelatedProductCard product={rp} onClick={() => router.push(`/produto/${rp.id}`)} />
+   649→                </motion.div>
+   650→              ))}
+   651→            </div>
+   652→          </motion.section>
+   653→        )}
+   654→      </div>
+   655→
+   656→      {/* ════════════════════ IMAGE ZOOM MODAL ════════════════════ */}
+   657→      <AnimatePresence>
+   658→        {imageZoom && allImages.length > 0 && (
+   659→          <motion.div
+   660→            initial={{ opacity: 0 }}
+   661→            animate={{ opacity: 1 }}
+   662→            exit={{ opacity: 0 }}
+   663→            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+   664→            onClick={() => setImageZoom(false)}
+   665→          >
+   666→            <button
+   667→              onClick={() => setImageZoom(false)}
+   668→              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10"
+   669→            >
+   670→              <X className="w-5 h-5 text-white" />
+   671→            </button>
+   672→            <img
+   673→              src={allImages[activeImage]}
+   674→              alt={product.name}
+   675→              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+   676→              onClick={(e) => e.stopPropagation()}
+   677→            />
+   678→            {allImages.length > 1 && (
+   679→              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+   680→                {allImages.map((_, i) => (
+   681→                  <button
+   682→                    key={i}
+   683→                    onClick={(e) => { e.stopPropagation(); setActiveImage(i); }}
+   684→                    className={`w-2.5 h-2.5 rounded-full transition-all ${i === activeImage ? 'bg-white scale-125' : 'bg-white/40 hover:bg-white/60'}`}
+   685→                  />
+   686→                ))}
+   687→              </div>
+   688→            )}
+   689→          </motion.div>
+   690→        )}
+   691→      </AnimatePresence>
+   692→    </div>
+   693→  );
+   694→}
+   695→
+   696→/* ─── Sub-components ─── */
+   697→
+   698→function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+   699→  return (
+   700→    <button
+   701→      onClick={onClick}
+   702→      className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
+   703→        active
+   704→          ? 'bg-zeny-green text-white shadow-sm shadow-zeny-green/20'
+   705→          : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+   706→      }`}
+   707→    >
+   708→      {children}
+   709→    </button>
+   710→  );
+   711→}
+   712→
+   713→function TabPanel({ children }: { children: React.ReactNode }) {
+   714→  return (
+   715→    <motion.div
+   716→      initial={{ opacity: 0, y: 8 }}
+   717→      animate={{ opacity: 1, y: 0 }}
+   718→      exit={{ opacity: 0, y: -8 }}
+   719→      transition={{ duration: 0.2 }}
+   720→      className="min-h-[120px]"
+   721→    >
+   722→      {children}
+   723→    </motion.div>
+   724→  );
+   725→}
+   726→
+   727→function RelatedProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
+   728→  const addItem = useCartStore((s) => s.addItem);
+   729→
+   730→  const handleCart = (e: React.MouseEvent) => {
+   731→    e.stopPropagation();
+   732→    if (!product.inStock) {
+   733→      toast.error('Este produto está esgotado');
+   734→      return;
+   735→    }
+   736→    addItem({ productId: product.id, name: product.name, price: product.price, image: product.image });
+   737→    toast.success(`${product.name} adicionado ao carrinho!`);
+   738→  };
+   739→
+   740→  return (
+   741→    <div
+   742→      onClick={onClick}
+   743→      className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-gray-100 hover:border-zeny-green/20 hover:shadow-lg transition-all cursor-pointer"
+   744→    >
+   745→      <div className="relative aspect-square overflow-hidden bg-gray-50">
+   746→        <img
+   747→          src={product.image}
+   748→          alt={product.name}
+   749→          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+   750→          onError={(e) => {
+   751→            const target = e.target as HTMLImageElement;
+   752→            target.style.display = 'none';
+   753→            const parent = target.parentElement;
+   754→            if (parent && !parent.querySelector('.img-fallback')) {
+   755→              parent.innerHTML = '<div class="img-fallback flex items-center justify-center w-full h-full bg-gray-100"><svg class="w-10 h-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>';
+   756→            }
+   757→          }}
+   758→        />
+   759→        {!product.inStock && (
+   760→          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+   761→            <span className="text-white text-xs font-medium bg-black/60 px-3 py-1 rounded-full">Esgotado</span>
+   762→          </div>
+   763→        )}
+   764→      </div>
+   765→      <div className="p-3">
+   766→        <p className="text-[10px] text-zeny-green font-medium uppercase tracking-wider mb-0.5">{product.category}</p>
+   767→        <h3 className="font-semibold text-gray-900 text-xs sm:text-sm leading-tight mb-1.5 line-clamp-2">{product.name}</h3>
+   768→        <div className="flex items-center justify-between">
+   769→          <span className="text-sm font-bold text-gray-900">
+   770→            {product.price.toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
+   771→          </span>
+   772→          <button
+   773→            onClick={handleCart}
+   774→            disabled={!product.inStock}
+   775→            className="w-7 h-7 rounded-full bg-zeny-green hover:bg-zeny-green-dark text-white flex items-center justify-center transition-colors disabled:opacity-40"
+   776→          >
+   777→            <ShoppingCart className="w-3.5 h-3.5" />
+   778→          </button>
+   779→        </div>
+   780→      </div>
+   781→    </div>
+   782→  );
+   783→}
