@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAdmin, unauthorizedResponse } from '@/lib/auth';
+import { randomUUID } from 'crypto';
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
     const { data: order, error: orderError } = await supabase
       .from('Order')
       .insert({
+        id: randomUUID(),
         customerName,
         customerPhone,
         province,
@@ -68,6 +70,7 @@ export async function POST(request: NextRequest) {
     // Create order items
     if (items && items.length > 0) {
       const orderItems = items.map((item: { productId: string; productName: string; quantity: number; price: number }) => ({
+        id: randomUUID(),
         orderId: order.id,
         productId: item.productId,
         productName: item.productName,
