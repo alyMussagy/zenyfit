@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import ScrollReveal from './ScrollReveal';
+import { MiniStarRating } from './ProductReviews';
 
 interface Product {
   id: string;
@@ -410,14 +411,17 @@ export default function ProductCatalog() {
 
                 {/* Info */}
                 <Link href={`/produto/${product.id}`} className="p-3 sm:p-4 cursor-pointer block">
-                  <motion.p
-                    className="text-[10px] sm:text-xs text-zeny-green font-medium uppercase tracking-wider mb-0.5 sm:mb-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 + index * 0.06 }}
-                  >
-                    {product.category}
-                  </motion.p>
+                  <div className="flex items-center justify-between mb-0.5 sm:mb-1">
+                    <motion.p
+                      className="text-[10px] sm:text-xs text-zeny-green font-medium uppercase tracking-wider"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 + index * 0.06 }}
+                    >
+                      {product.category}
+                    </motion.p>
+                    <MiniStarRating productId={product.id} />
+                  </div>
                   <h3 className="font-semibold text-zeny-green-dark text-xs sm:text-sm leading-tight mb-1 sm:mb-2 line-clamp-2">{product.name}</h3>
                   <p className="text-[10px] sm:text-xs text-zeny-green-dark/50 mb-2 sm:mb-3 line-clamp-1 sm:line-clamp-2">{product.description}</p>
                   <div className="flex items-center justify-between">

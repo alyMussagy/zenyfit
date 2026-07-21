@@ -62,12 +62,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (!comment?.trim()) {
-      return NextResponse.json(
-        { error: 'O campo comment é obrigatório' },
-        { status: 400 }
-      );
-    }
+
 
     const { data, error } = await supabase
       .from('Review')
@@ -76,7 +71,7 @@ export async function POST(request: NextRequest) {
         productId,
         customerName: customerName.trim(),
         rating: Math.round(rating),
-        comment: comment.trim(),
+        comment: comment?.trim() || '',
         approved: approved ?? true,
       })
       .select()

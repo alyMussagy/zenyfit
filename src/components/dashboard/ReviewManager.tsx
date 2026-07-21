@@ -52,6 +52,12 @@ export default function ReviewManager() {
   const [submitting, setSubmitting] = useState(false);
   const [addForm, setAddForm] = useState({ productId: '', customerName: '', rating: 4, comment: '' });
 
+  // Fetch products for the dropdown selector
+  const { data: products } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ['products-for-review'],
+    queryFn: () => fetch('/api/products').then((r) => r.json()).then((d) => (Array.isArray(d) ? d : [])),
+  });
+
   const statusParam = statusFilter !== 'all' ? `&status=${statusFilter}` : '';
   const { data: reviews, isLoading } = useQuery<Review[]>({
     queryKey: ['reviews-admin', statusFilter],
@@ -86,8 +92,8 @@ export default function ReviewManager() {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!addForm.productId.trim() || !addForm.customerName.trim()) {
-      toast.error('Preencha o ID do produto e o nome');
+    if (!addForm.productId || !addForm.customerName.trim()) {
+      toast.error('Seleccione um produto e digite o nome do cliente');
       return;
     }
     setSubmitting(true);
@@ -173,14 +179,18 @@ export default function ReviewManager() {
             <form onSubmit={handleAdd} className="space-y-3">
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
-                  <Label className="text-xs">ID do Produto</Label>
-                  <Input
+                  <Label className="text-xs">Produto</Label>
+                  <select
                     value={addForm.productId}
                     onChange={(e) => setAddForm({ ...addForm, productId: e.target.value })}
-                    placeholder="UUID"
-                    className="mt-1 h-9 text-xs"
+                    className="mt-1 h-9 w-full text-xs border border-gray-200 rounded-lg px-2 bg-white focus:outline-none focus:ring-2 focus:ring-zeny-green/30"
                     required
-                  />
+                  >
+                    <option value="">Seleccionar produto...</option>
+                    {products?.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-span-1">
                   <Label className="text-xs">Nome do Cliente</Label>
