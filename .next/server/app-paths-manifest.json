@@ -15,6 +15,7 @@
   "/api/products/route": "app/api/products/route.js",
   "/api/route": "app/api/route.js",
   "/api/track/route": "app/api/track/route.js",
+  "/api/upload/route": "app/api/upload/route.js",
   "/page": "app/page.js",
   "/produto/[id]/page": "app/produto/[id]/page.js"
 }

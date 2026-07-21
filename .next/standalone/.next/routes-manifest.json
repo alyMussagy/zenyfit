@@ -140,6 +140,12 @@
       "regex": "^/api/track(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/track(?:/)?$"
+    },
+    {
+      "page": "/api/upload",
+      "regex": "^/api/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/upload(?:/)?$"
     }
   ],
   "dataRoutes": [],
