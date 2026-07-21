@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth-store';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { authFetch } from '@/lib/auth-fetch';
 
 interface Admin {
@@ -116,8 +117,9 @@ export default function AdminManager() {
     }
   };
 
+  const [confirmDeleteAdmin, setConfirmDeleteAdmin] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
-    if (!confirm('Eliminar este administrador?')) return;
     try {
       await authFetch(`/api/admins/${id}`, { method: 'DELETE' });
       toast.success('Administrador eliminado');
@@ -313,7 +315,7 @@ export default function AdminManager() {
                                 <Key className="w-4 h-4 text-gray-400" />
                               </button>
                               <button
-                                onClick={() => handleDelete(admin.id)}
+                                onClick={() => setConfirmDeleteAdmin(admin.id)}
                                 className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center"
                                 title="Eliminar"
                               >
@@ -361,7 +363,7 @@ export default function AdminManager() {
                         <button onClick={() => handleToggle(admin)} className="w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center">
                           <Key className="w-4 h-4 text-gray-400" />
                         </button>
-                        <button onClick={() => handleDelete(admin.id)} className="w-9 h-9 rounded-lg hover:bg-red-50 flex items-center justify-center">
+                        <button onClick={() => setConfirmDeleteAdmin(admin.id)} className="w-9 h-9 rounded-lg hover:bg-red-50 flex items-center justify-center">
                           <Trash2 className="w-4 h-4 text-red-400" />
                         </button>
                       </div>
@@ -373,6 +375,14 @@ export default function AdminManager() {
           </CardContent>
         </Card>
       )}
+      <ConfirmDialog
+        open={!!confirmDeleteAdmin}
+        title="Eliminar Administrador"
+        message="Tem certeza que deseja eliminar este administrador? Esta acção não pode ser desfeita."
+        confirmLabel="Eliminar"
+        onConfirm={() => confirmDeleteAdmin && handleDelete(confirmDeleteAdmin)}
+        onCancel={() => setConfirmDeleteAdmin(null)}
+      />
     </div>
   );
 }

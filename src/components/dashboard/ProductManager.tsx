@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { authFetch } from '@/lib/auth-fetch';
@@ -66,6 +67,7 @@ export default function ProductManager() {
   const [search, setSearch] = useState('');
   const [uploading, setUploading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<ProductForm>(emptyForm);
   const queryClient = useQueryClient();
@@ -111,7 +113,6 @@ export default function ProductManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja eliminar este produto?')) return;
     try {
       await authFetch(`/api/products/${id}`, { method: 'DELETE' });
       toast.success('Produto eliminado');
@@ -516,7 +517,7 @@ export default function ProductManager() {
                           <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center" title="Editar">
                             <Pencil className="w-4 h-4 text-blue-500" />
                           </button>
-                          <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center" title="Eliminar">
+                          <button onClick={() => setConfirmDelete(product.id)} className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center" title="Eliminar">
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </button>
                         </div>
@@ -529,6 +530,14 @@ export default function ProductManager() {
           </CardContent>
         </Card>
       )}
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title="Eliminar Produto"
+        message="Tem certeza que deseja eliminar este produto? Esta acção não pode ser desfeita."
+        confirmLabel="Eliminar"
+        onConfirm={() => confirmDelete && handleDelete(confirmDelete)}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

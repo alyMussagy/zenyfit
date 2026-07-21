@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Package, ChevronDown, ChevronUp, Search, MessageCircle, Trash2 } from 'lucide-react';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { useState, useMemo } from 'react';
 import { authFetch } from '@/lib/auth-fetch';
 
@@ -91,8 +92,9 @@ export default function OrderManager() {
     }
   };
 
+  const [confirmDeleteOrder, setConfirmDeleteOrder] = useState<string | null>(null);
+
   const deleteOrder = async (orderId: string) => {
-    if (!confirm('Tem certeza que deseja eliminar este pedido?')) return;
     try {
       await authFetch(`/api/orders/${orderId}`, { method: 'DELETE' });
       toast.success('Pedido eliminado');
@@ -230,7 +232,7 @@ export default function OrderManager() {
                           variant="ghost"
                           size="icon"
                           className="w-8 h-8 text-red-400 hover:text-red-600 hover:bg-red-50"
-                          onClick={() => deleteOrder(order.id)}
+                          onClick={() => setConfirmDeleteOrder(order.id)}
                           title="Eliminar pedido"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -273,6 +275,14 @@ export default function OrderManager() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={!!confirmDeleteOrder}
+        title="Eliminar Pedido"
+        message="Tem certeza que deseja eliminar este pedido? Esta acção não pode ser desfeita."
+        confirmLabel="Eliminar"
+        onConfirm={() => confirmDeleteOrder && deleteOrder(confirmDeleteOrder)}
+        onCancel={() => setConfirmDeleteOrder(null)}
+      />
     </div>
   );
 }
